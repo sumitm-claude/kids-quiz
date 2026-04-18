@@ -215,22 +215,22 @@ function PinPad({title,sub,onOk,cPin=null}){
     <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:20}}>
       <div style={{background:"white",borderRadius:28,padding:"34px 26px",maxWidth:300,width:"100%",textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,.3)"}}>
         <div style={{fontSize:42,marginBottom:8}}>🔐</div>
-        <h2 style={{color:"#333",margin:"0 0 4px",fontSize:19}}>{lbl}</h2>
-        <p style={{color:"#aaa",fontSize:12,margin:"0 0 20px"}}>{sb}</p>
+        <h2 style={{color:"#333",margin:"0 0 4px",fontSize:23}}>{lbl}</h2>
+        <p style={{color:"#aaa",fontSize:14,margin:"0 0 20px"}}>{sb}</p>
         <div style={{display:"flex",justifyContent:"center",gap:13,marginBottom:20,animation:shk?"shake .5s":"none"}}>
           {[0,1,2,3].map(i=><div key={i} style={{width:15,height:15,borderRadius:"50%",border:"2.5px solid #7C83FD",background:digs[i]!=null?"#7C83FD":"transparent",transition:"background .15s"}}/>)}
         </div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:10}}>
           {[1,2,3,4,5,6,7,8,9].map(n=>(
-            <button key={n} onClick={()=>press(String(n))} style={{background:"#f4f4f4",border:"none",borderRadius:13,padding:"14px 0",fontSize:20,fontWeight:700,color:"#333",cursor:"pointer",fontFamily:"inherit"}}>{n}</button>
+            <button key={n} onClick={()=>press(String(n))} style={{background:"#f4f4f4",border:"none",borderRadius:13,padding:"14px 0",fontSize:24,fontWeight:700,color:"#333",cursor:"pointer",fontFamily:"inherit"}}>{n}</button>
           ))}
           <div/>
-          <button onClick={()=>press("0")} style={{background:"#f4f4f4",border:"none",borderRadius:13,padding:"14px 0",fontSize:20,fontWeight:700,color:"#333",cursor:"pointer",fontFamily:"inherit"}}>0</button>
-          <button onClick={()=>setDigs(d=>d.slice(0,-1))} style={{background:"#f4f4f4",border:"none",borderRadius:13,padding:"14px 0",fontSize:16,cursor:"pointer",fontFamily:"inherit"}}>⌫</button>
+          <button onClick={()=>press("0")} style={{background:"#f4f4f4",border:"none",borderRadius:13,padding:"14px 0",fontSize:24,fontWeight:700,color:"#333",cursor:"pointer",fontFamily:"inherit"}}>0</button>
+          <button onClick={()=>setDigs(d=>d.slice(0,-1))} style={{background:"#f4f4f4",border:"none",borderRadius:13,padding:"14px 0",fontSize:19,cursor:"pointer",fontFamily:"inherit"}}>⌫</button>
         </div>
-        {err&&<p style={{color:"#dc3545",fontSize:12,margin:0,fontWeight:600}}>{err}</p>}
+        {err&&<p style={{color:"#dc3545",fontSize:14,margin:0,fontWeight:600}}>{err}</p>}
       </div>
-      <style>{`@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}`}</style>
     </div>
   );
 }
@@ -241,12 +241,12 @@ function UnlockModal({lv,onClose}){
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.75)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:200,padding:20}}>
       <div style={{background:"white",borderRadius:28,padding:"34px 22px",maxWidth:320,width:"100%",textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,.4)"}}>
         <div style={{fontSize:68,marginBottom:8}}>{lv==="hard"?"🔥":"⭐"}</div>
-        <h2 style={{color:"#333",fontSize:23,margin:"0 0 8px"}}>{L.lbl} Mode Unlocked!</h2>
-        <p style={{color:"#555",fontSize:15,margin:"0 0 4px"}}>You answered <strong style={{color:L.col}}>{L.at} questions</strong> correctly!</p>
-        <p style={{color:"#aaa",fontSize:13,margin:"0 0 22px"}}>{lv==="hard"?"Ready for the toughest challenges!":"Ready for something harder?"}</p>
+        <h2 style={{color:"#333",fontSize:28,margin:"0 0 8px"}}>{L.lbl} Mode Unlocked!</h2>
+        <p style={{color:"#555",fontSize:18,margin:"0 0 4px"}}>You answered <strong style={{color:L.col}}>{L.at} questions</strong> correctly!</p>
+        <p style={{color:"#aaa",fontSize:16,margin:"0 0 22px"}}>{lv==="hard"?"Ready for the toughest challenges!":"Ready for something harder?"}</p>
         <div style={{display:"flex",gap:8,justifyContent:"center"}}>
-          <button onClick={()=>onClose(false)} style={{background:"#f0f0f0",color:"#666",border:"none",borderRadius:13,padding:"10px 15px",fontSize:13,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>Stay here</button>
-          <button onClick={()=>onClose(true)} style={{background:`linear-gradient(135deg,${L.col},#764ba2)`,color:"white",border:"none",borderRadius:13,padding:"10px 15px",fontSize:13,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>Try {L.em} {L.lbl}! →</button>
+          <button onClick={()=>onClose(false)} style={{background:"#f0f0f0",color:"#666",border:"none",borderRadius:13,padding:"10px 15px",fontSize:16,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>Stay here</button>
+          <button onClick={()=>onClose(true)} style={{background:`linear-gradient(135deg,${L.col},#764ba2)`,color:"white",border:"none",borderRadius:13,padding:"10px 15px",fontSize:16,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>Try {L.em} {L.lbl}! →</button>
         </div>
       </div>
     </div>
@@ -346,19 +346,19 @@ export default function App(){
     <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#667eea,#764ba2)",fontFamily:"'Nunito',cursive",padding:16}}>
       <div style={{maxWidth:540,margin:"0 auto"}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-          <button onClick={()=>setSc("quiz")} style={{background:"rgba(255,255,255,.2)",border:"none",borderRadius:12,padding:"7px 14px",color:"white",fontSize:16,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>← Back</button>
-          <h2 style={{color:"white",margin:0,fontSize:19}}>⚙️ Quiz Categories</h2>
+          <button onClick={()=>setSc("quiz")} style={{background:"rgba(255,255,255,.2)",border:"none",borderRadius:12,padding:"7px 14px",color:"white",fontSize:19,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>← Back</button>
+          <h2 style={{color:"white",margin:0,fontSize:23}}>⚙️ Quiz Categories</h2>
         </div>
         <div style={{background:"white",borderRadius:20,padding:15,marginBottom:13,boxShadow:"0 8px 32px rgba(0,0,0,.2)"}}>
-          <p style={{color:"#bbb",fontSize:10,margin:"0 0 10px",fontWeight:700,letterSpacing:1}}>TAP TO TOGGLE ON / OFF</p>
+          <p style={{color:"#bbb",fontSize:12,margin:"0 0 10px",fontWeight:700,letterSpacing:1}}>TAP TO TOGGLE ON / OFF</p>
           {allC.map(c=>{
             const cc=getCol(c,xC),on=act.includes(c);
             const ec=[["easy","🟢","#d4edda","#155724"],["medium","🟡","#fff3cd","#856404"],["hard","🔴","#f8d7da","#721c24"]].map(([d,em,bg,fg])=>({em,bg,fg,n:allQ.filter(q=>q.cat===c&&q.d===d).length}));
             return(
               <div key={c} onClick={()=>toggleCat(c)} style={{display:"flex",alignItems:"center",gap:8,padding:"9px 10px",borderRadius:13,marginBottom:5,cursor:"pointer",background:on?cc.lt:"#f7f7f7",border:`2px solid ${on?cc.bg:"#eee"}`,transition:"all .2s"}}>
                 <div style={{width:10,height:10,borderRadius:"50%",background:on?cc.bg:"#ccc",flexShrink:0}}/>
-                <span style={{flex:1,fontWeight:700,color:on?"#333":"#bbb",fontSize:11,lineHeight:1.3}}>{c}</span>
-                <div style={{display:"flex",gap:3}}>{ec.map(({em,bg,fg,n})=><span key={em} style={{background:bg,color:fg,borderRadius:5,padding:"2px 4px",fontSize:9,fontWeight:700}}>{em}{n}</span>)}</div>
+                <span style={{flex:1,fontWeight:700,color:on?"#333":"#bbb",fontSize:13,lineHeight:1.3}}>{c}</span>
+                <div style={{display:"flex",gap:3}}>{ec.map(({em,bg,fg,n})=><span key={em} style={{background:bg,color:fg,borderRadius:5,padding:"2px 4px",fontSize:11,fontWeight:700}}>{em}{n}</span>)}</div>
                 <div style={{width:32,height:17,borderRadius:9,background:on?cc.bg:"#ddd",position:"relative",flexShrink:0}}>
                   <div style={{position:"absolute",top:2,left:on?16:2,width:13,height:13,borderRadius:"50%",background:"white",transition:"left .2s",boxShadow:"0 1px 3px rgba(0,0,0,.2)"}}/>
                 </div>
@@ -367,14 +367,14 @@ export default function App(){
           })}
         </div>
         <div style={{background:"white",borderRadius:20,padding:15,boxShadow:"0 8px 32px rgba(0,0,0,.2)"}}>
-          <h3 style={{margin:"0 0 3px",color:"#333",fontSize:14}}>✨ Add a New Category</h3>
-          <p style={{color:"#aaa",fontSize:11,margin:"0 0 10px"}}>AI generates Easy, Medium & Hard questions automatically!</p>
+          <h3 style={{margin:"0 0 3px",color:"#333",fontSize:17}}>✨ Add a New Category</h3>
+          <p style={{color:"#aaa",fontSize:13,margin:"0 0 10px"}}>AI generates Easy, Medium & Hard questions automatically!</p>
           <div style={{display:"flex",gap:7,marginBottom:7}}>
-            <input value={nCat} onChange={e=>{setNCat(e.target.value);setGErr("");}} onKeyDown={e=>e.key==="Enter"&&doGen()} placeholder="e.g. Solar System, US Presidents…" disabled={gen} style={{flex:1,border:"2.5px solid #7C83FD",borderRadius:11,padding:"9px 11px",fontSize:13,fontFamily:"inherit",outline:"none",color:"#333"}}/>
-            <button onClick={doGen} disabled={!nCat.trim()||gen} style={{background:nCat.trim()&&!gen?"linear-gradient(135deg,#7C83FD,#764ba2)":"#ddd",color:"white",border:"none",borderRadius:11,padding:"0 13px",fontSize:13,cursor:nCat.trim()&&!gen?"pointer":"default",fontFamily:"inherit",fontWeight:700,whiteSpace:"nowrap"}}>{gen?"⏳":"Add ✨"}</button>
+            <input value={nCat} onChange={e=>{setNCat(e.target.value);setGErr("");}} onKeyDown={e=>e.key==="Enter"&&doGen()} placeholder="e.g. Solar System, US Presidents…" disabled={gen} style={{flex:1,border:"2.5px solid #7C83FD",borderRadius:11,padding:"9px 11px",fontSize:16,fontFamily:"inherit",outline:"none",color:"#333"}}/>
+            <button onClick={doGen} disabled={!nCat.trim()||gen} style={{background:nCat.trim()&&!gen?"linear-gradient(135deg,#7C83FD,#764ba2)":"#ddd",color:"white",border:"none",borderRadius:11,padding:"0 13px",fontSize:16,cursor:nCat.trim()&&!gen?"pointer":"default",fontFamily:"inherit",fontWeight:700,whiteSpace:"nowrap"}}>{gen?"⏳":"Add ✨"}</button>
           </div>
-          {gSt&&<p style={{color:gSt.startsWith("✅")?"#28a745":"#667eea",fontSize:12,margin:0,fontWeight:600}}>{gSt}</p>}
-          {gErr&&<p style={{color:"#dc3545",fontSize:12,margin:0,fontWeight:600}}>{gErr}</p>}
+          {gSt&&<p style={{color:gSt.startsWith("✅")?"#28a745":"#667eea",fontSize:14,margin:0,fontWeight:600}}>{gSt}</p>}
+          {gErr&&<p style={{color:"#dc3545",fontSize:14,margin:0,fontWeight:600}}>{gErr}</p>}
         </div>
       </div>
     </div>
@@ -383,13 +383,13 @@ export default function App(){
   if(!q)return(
     <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"linear-gradient(135deg,#667eea,#764ba2)",color:"white",fontFamily:"'Nunito',cursive",textAlign:"center",padding:20}}>
       <div style={{fontSize:42,marginBottom:10}}>😅</div>
-      <p style={{fontSize:17,margin:"0 0 5px",fontWeight:700}}>No {lv} questions active!</p>
-      <p style={{fontSize:13,opacity:.8,margin:"0 0 16px"}}>Switch level or enable more categories.</p>
+      <p style={{fontSize:20,margin:"0 0 5px",fontWeight:700}}>No {lv} questions active!</p>
+      <p style={{fontSize:16,opacity:.8,margin:"0 0 16px"}}>Switch level or enable more categories.</p>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"center"}}>
         {LVS.filter(L=>unlk.includes(L.id)&&L.id!==lv).map(L=>(
-          <button key={L.id} onClick={()=>setLv(L.id)} style={{background:"white",color:L.col,border:"none",borderRadius:12,padding:"9px 16px",fontSize:13,cursor:"pointer",fontWeight:700,fontFamily:"inherit"}}>{L.em} {L.lbl}</button>
+          <button key={L.id} onClick={()=>setLv(L.id)} style={{background:"white",color:L.col,border:"none",borderRadius:12,padding:"9px 16px",fontSize:16,cursor:"pointer",fontWeight:700,fontFamily:"inherit"}}>{L.em} {L.lbl}</button>
         ))}
-        <button onClick={openMenu} style={{background:"rgba(255,255,255,.15)",border:"2px solid white",color:"white",borderRadius:12,padding:"9px 16px",fontSize:13,cursor:"pointer",fontWeight:700,fontFamily:"inherit"}}>⚙️ Categories</button>
+        <button onClick={openMenu} style={{background:"rgba(255,255,255,.15)",border:"2px solid white",color:"white",borderRadius:12,padding:"9px 16px",fontSize:16,cursor:"pointer",fontWeight:700,fontFamily:"inherit"}}>⚙️ Categories</button>
       </div>
     </div>
   );
@@ -398,56 +398,57 @@ export default function App(){
     <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:12}}>
       <div style={{background:"white",borderRadius:28,padding:"17px 17px 22px",maxWidth:560,width:"100%",boxShadow:"0 24px 64px rgba(0,0,0,.3)"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-          <span style={{background:col.bg,color:"white",borderRadius:20,padding:"3px 10px",fontSize:10,fontWeight:700,maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{q.cat}</span>
+          <span style={{background:col.bg,color:"white",borderRadius:20,padding:"3px 10px",fontSize:12,fontWeight:700,maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{q.cat}</span>
           <div style={{display:"flex",gap:5,alignItems:"center"}}>
-            <span style={{background:"#f0f0f0",borderRadius:10,padding:"3px 7px",fontSize:11,fontWeight:700,color:"#555"}}>✅{cor}</span>
-            <span style={{background:"#f0f0f0",borderRadius:10,padding:"3px 7px",fontSize:11,fontWeight:700,color:"#555"}}>📊{pct}%</span>
-            <span style={{background:str>=3?"#fff3cd":"#f0f0f0",borderRadius:10,padding:"3px 7px",fontSize:11,fontWeight:700,color:str>=3?"#856404":"#555"}}>🔥{str}</span>
-            <button onClick={openMenu} style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"4px 8px",cursor:"pointer",fontSize:14,lineHeight:1,marginLeft:2}}>☰</button>
+            <span style={{background:"#f0f0f0",borderRadius:10,padding:"3px 7px",fontSize:13,fontWeight:700,color:"#555"}}>✅{cor}</span>
+            <span style={{background:"#f0f0f0",borderRadius:10,padding:"3px 7px",fontSize:13,fontWeight:700,color:"#555"}}>📊{pct}%</span>
+            <span style={{background:str>=3?"#fff3cd":"#f0f0f0",borderRadius:10,padding:"3px 7px",fontSize:13,fontWeight:700,color:str>=3?"#856404":"#555"}}>🔥{str}</span>
+            <button onClick={openMenu} style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"4px 8px",cursor:"pointer",fontSize:17,lineHeight:1,marginLeft:2}}>☰</button>
           </div>
         </div>
         <div style={{display:"flex",gap:5,justifyContent:"center",marginBottom:8}}>
           {LVS.map(L=>{
             const locked=!unlk.includes(L.id),sel=lv===L.id;
             return(
-              <button key={L.id} onClick={()=>!locked&&setLv(L.id)} style={{background:sel?L.col:locked?"#f5f5f5":"#f0f0f0",color:sel?"white":locked?"#ccc":"#777",border:`2px solid ${sel?L.col:locked?"#eee":"#ddd"}`,borderRadius:17,padding:"4px 11px",fontSize:11,fontWeight:700,cursor:locked?"not-allowed":"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:2}}>
-                {locked?"🔒":L.em} {L.lbl}{locked&&<span style={{fontSize:9}}>({L.at}✅)</span>}
+              <button key={L.id} onClick={()=>!locked&&setLv(L.id)} style={{background:sel?L.col:locked?"#f5f5f5":"#f0f0f0",color:sel?"white":locked?"#ccc":"#777",border:`2px solid ${sel?L.col:locked?"#eee":"#ddd"}`,borderRadius:17,padding:"4px 11px",fontSize:13,fontWeight:700,cursor:locked?"not-allowed":"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:2}}>
+                {locked?"🔒":L.em} {L.lbl}{locked&&<span style={{fontSize:11}}>({L.at}✅)</span>}
               </button>
             );
           })}
         </div>
-        <div style={{textAlign:"right",fontSize:10,color:"#ccc",marginBottom:9}}>Question #{tot+1}</div>
+        <div style={{textAlign:"right",fontSize:12,color:"#ccc",marginBottom:9}}>Question #{tot+1}</div>
         <div style={{background:col.lt,border:`2px solid ${col.bg}33`,borderRadius:17,padding:"16px 14px",marginBottom:12,minHeight:65,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4}}>
-          <p style={{color:"#333",fontSize:16,margin:0,textAlign:"center",lineHeight:1.6,fontWeight:600}}>{q.q}</p>
-          {q.cat===CATS[0]&&<p style={{color:col.bg,fontSize:11,margin:0,fontWeight:700}}>Type both words — e.g. CAT BAT</p>}
+          <p style={{color:"#333",fontSize:19,margin:0,textAlign:"center",lineHeight:1.7,fontWeight:600}}>{q.q}</p>
+          {q.cat===CATS[0]&&<p style={{color:col.bg,fontSize:13,margin:0,fontWeight:700}}>Type both words — e.g. CAT BAT</p>}
         </div>
         {!sub&&(
           <div style={{textAlign:"center",marginBottom:9}}>
-            {shint?<span style={{color:"#aaa",fontSize:12,letterSpacing:2}}>{mkHint(q)}</span>
-            :<button onClick={()=>setShint(true)} style={{background:"none",border:"none",color:col.bg,fontSize:12,cursor:"pointer",fontFamily:"inherit",fontWeight:700,textDecoration:"underline"}}>💡 Show hint</button>}
+            {shint?<span style={{color:"#aaa",fontSize:14,letterSpacing:2}}>{mkHint(q)}</span>
+            :<button onClick={()=>setShint(true)} style={{background:"none",border:"none",color:col.bg,fontSize:14,cursor:"pointer",fontFamily:"inherit",fontWeight:700,textDecoration:"underline"}}>💡 Show hint</button>}
           </div>
         )}
         {!sub&&(
           <div style={{display:"flex",gap:7,marginBottom:9}}>
-            <input ref={iRef} value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={hk} placeholder="Type your answer…" style={{flex:1,border:`2.5px solid ${col.bg}`,borderRadius:13,padding:"11px 13px",fontSize:16,fontFamily:"inherit",outline:"none",color:"#333"}}/>
-            <button onClick={doSub} disabled={!inp.trim()} style={{background:inp.trim()?`linear-gradient(135deg,${col.bg},#764ba2)`:"#ddd",color:"white",border:"none",borderRadius:13,padding:"0 15px",fontSize:18,cursor:inp.trim()?"pointer":"default",fontFamily:"inherit",fontWeight:700}}>✓</button>
+            <input ref={iRef} value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={hk} placeholder="Type your answer…" style={{flex:1,border:`2.5px solid ${col.bg}`,borderRadius:13,padding:"11px 13px",fontSize:19,fontFamily:"inherit",outline:"none",color:"#333"}}/>
+            <button onClick={doSub} disabled={!inp.trim()} style={{background:inp.trim()?`linear-gradient(135deg,${col.bg},#764ba2)`:"#ddd",color:"white",border:"none",borderRadius:13,padding:"0 15px",fontSize:22,cursor:inp.trim()?"pointer":"default",fontFamily:"inherit",fontWeight:700}}>✓</button>
           </div>
         )}
         {sub&&(
           <div style={{textAlign:"center"}}>
-            <div style={{fontSize:20,fontWeight:700,marginBottom:5,color:isOk?"#28a745":"#dc3545",animation:anm==="pop"?"pop .4s ease":anm==="wiggle"?"wiggle .45s ease":"none"}}>{msg}</div>
-            {str>=3&&isOk&&<div style={{fontSize:12,color:"#e67e22",fontWeight:700,marginBottom:3}}>🔥 {str} in a row!</div>}
-            {!isOk&&<div style={{fontSize:13,color:"#666",marginBottom:7}}>Answer: <strong style={{color:"#28a745"}}>{q.a[0]}</strong></div>}
-            <button onClick={nxt} style={{background:`linear-gradient(135deg,${col.bg},#764ba2)`,color:"white",border:"none",borderRadius:16,padding:"11px 24px",fontSize:15,cursor:"pointer",fontFamily:"inherit",fontWeight:700,boxShadow:"0 4px 16px rgba(0,0,0,.18)"}}>Next Question →</button>
+            <div style={{fontSize:24,fontWeight:700,marginBottom:5,color:isOk?"#28a745":"#dc3545",animation:anm==="pop"?"pop .4s ease":anm==="wiggle"?"wiggle .45s ease":"none"}}>{msg}</div>
+            {str>=3&&isOk&&<div style={{fontSize:14,color:"#e67e22",fontWeight:700,marginBottom:3}}>🔥 {str} in a row!</div>}
+            {!isOk&&<div style={{fontSize:16,color:"#666",marginBottom:7}}>Answer: <strong style={{color:"#28a745"}}>{q.a[0]}</strong></div>}
+            <button onClick={nxt} style={{background:`linear-gradient(135deg,${col.bg},#764ba2)`,color:"white",border:"none",borderRadius:16,padding:"11px 24px",fontSize:18,cursor:"pointer",fontFamily:"inherit",fontWeight:700,boxShadow:"0 4px 16px rgba(0,0,0,.18)"}}>Next Question →</button>
           </div>
         )}
       </div>
       {popup&&<UnlockModal lv={popup} onClose={(sw)=>{if(sw)setLv(popup);setPopup(null);}}/>}
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
         @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
         @keyframes wiggle{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
         @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
-        input::placeholder{color:#ccc;}
+        input::placeholder{color:#999;}
       `}</style>
     </div>
   );
