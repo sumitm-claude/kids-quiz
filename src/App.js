@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const CATS=["2 Words – One Letter Apart","Anagrammed States","World Capitals","State Capitals","Study-ology","Etymology – Countries","Etymology – Capitals","Etymology – States","Etymology – State Capitals","English – Indian Origin"];
+const CATS=["2 Words – One Letter Apart","Anagrammed States","World Capitals","State Capitals","Study-ology","Etymology – Countries","Etymology – Capitals","Etymology – States","Etymology – State Capitals","English – Indian Origin","⚽ Soccer"];
 const DIFFS=["easy","medium","hard"];
 const RAW=[
 [0,"A sweet baked treat  /  A body of still water",["CAKE","LAKE"],0],
@@ -151,6 +151,21 @@ const RAW=[
 [9,"🇮🇳 This word for a massive unstoppable force came from Sanskrit 'Jagannath' — a title of Vishnu",["JUGGERNAUT"],2],
 [9,"🇮🇳 This word for a thin cigar came from Tamil 'churuttu' meaning roll",["CHEROOT"],2],
 [9,"🇮🇳 This spiced soup's name came from Tamil 'milagu tannir' meaning pepper water",["MULLIGATAWNY"],2],
+[10,"⚽ Erling Haaland plays for which Premier League club?",["MANCHESTER CITY","MAN CITY"],0],
+[10,"⚽ Which club plays their home games at Old Trafford?",["MANCHESTER UNITED","MAN UNITED","MAN UTD"],0],
+[10,"⚽ Kylian Mbappe joined which Spanish club in 2024?",["REAL MADRID"],0],
+[10,"⚽ Harry Kane plays for which Bundesliga club?",["BAYERN MUNICH","FC BAYERN MUNICH","FC BAYERN"],0],
+[10,"⚽ Which Spanish club is nicknamed 'Barça'?",["BARCELONA","FC BARCELONA"],0],
+[10,"⚽ Jude Bellingham plays for which Spanish club?",["REAL MADRID"],1],
+[10,"⚽ Which Premier League club plays their home games at Anfield?",["LIVERPOOL","LIVERPOOL FC"],1],
+[10,"⚽ Lamine Yamal plays for which La Liga club?",["BARCELONA","FC BARCELONA"],1],
+[10,"⚽ Which Bundesliga club plays in Dortmund and wears yellow and black?",["BORUSSIA DORTMUND","BVB"],1],
+[10,"⚽ Arsenal play their home games at which stadium?",["EMIRATES STADIUM","THE EMIRATES"],1],
+[10,"⚽ Bukayo Saka plays for which Premier League club?",["ARSENAL"],2],
+[10,"⚽ Robert Lewandowski plays for which La Liga club?",["BARCELONA","FC BARCELONA"],2],
+[10,"⚽ Which La Liga club plays at the Wanda Metropolitano stadium?",["ATLETICO MADRID","ATLETICO DE MADRID"],2],
+[10,"⚽ Florian Wirtz plays for which Bundesliga club?",["BAYER LEVERKUSEN","BAYER 04 LEVERKUSEN"],2],
+[10,"⚽ Manchester City play their home games at which stadium?",["ETIHAD STADIUM","THE ETIHAD"],2],
 ];
 
 const Q=RAW.map(([c,q,a,d])=>({cat:CATS[c],q,a,d:DIFFS[d]}));
@@ -158,9 +173,9 @@ const PAL=[
   {bg:"#FF6B6B",lt:"#fff0f0"},{bg:"#4ECDC4",lt:"#f0fffe"},{bg:"#45B7D1",lt:"#f0faff"},
   {bg:"#7C83FD",lt:"#f2f0ff"},{bg:"#F7B731",lt:"#fffbf0"},{bg:"#FC5C65",lt:"#fff0f1"},
   {bg:"#26de81",lt:"#f0fff6"},{bg:"#fd9644",lt:"#fff4ee"},{bg:"#a55eea",lt:"#f8f0ff"},
-  {bg:"#2bcbba",lt:"#f0fffd"},{bg:"#e84393",lt:"#fff0f8"},{bg:"#0a9396",lt:"#f0fafa"},{bg:"#e9c46a",lt:"#fffbee"},
+  {bg:"#2bcbba",lt:"#f0fffd"},{bg:"#27ae60",lt:"#f0fff4"},{bg:"#e84393",lt:"#fff0f8"},{bg:"#0a9396",lt:"#f0fafa"},{bg:"#e9c46a",lt:"#fffbee"},
 ];
-function getCol(cat,xC){const i=CATS.indexOf(cat);return i>=0?PAL[i]:PAL[10+(Math.max(0,xC.indexOf(cat))%3)];}
+function getCol(cat,xC){const i=CATS.indexOf(cat);return i>=0?PAL[i]:PAL[11+(Math.max(0,xC.indexOf(cat))%3)];}
 function shuf(a){return[...a].sort(()=>Math.random()-.5);}
 function norm(s){return s.toUpperCase().replace(/[^A-Z0-9 ]/g,"").replace(/\s+/g," ").trim();}
 function chk(inp,q){
