@@ -300,6 +300,7 @@ export default function App(){
   const[msg,setMsg]=useState("");
   const[anm,setAnm]=useState("");
   const iRef=useRef(null);
+  const fetchingRef=useRef(false);
 
   // Persist key state
   useEffect(()=>{if(pin)lsSet('kq_pin',pin);},[pin]);
@@ -319,7 +320,7 @@ export default function App(){
   const col=q?getCol(q.cat,xC):PAL[0];
   const pct=tot>0?Math.round((cor/tot)*100):0;
 
-  useEffect(()=>{if(pool.length>0){setQue(shuf(pool));setQi(0);rst();}},[lv,JSON.stringify(actC),xQs.length]);
+  useEffect(()=>{if(pool.length>0){setQue(shuf(pool));setQi(0);rst();}},[lv,JSON.stringify(actC)]);
   useEffect(()=>{
     if(cor>=25&&!unlk.includes("hard")){setUnlk(["easy","medium","hard"]);setPopup("hard");}
     else if(cor>=10&&!unlk.includes("medium")){setUnlk(["easy","medium"]);setPopup("medium");}
@@ -337,7 +338,23 @@ export default function App(){
     else{setStr(0);setMsg(ERM[~~(Math.random()*ERM.length)]);setAnm("wiggle");}
     setSub(true);setTimeout(()=>setAnm(""),600);
   }
-  function nxt(){const ni=qi+1;if(ni%pool.length===0)setQue(shuf(pool));setQi(ni);rst();}
+  async function fetchMore(){
+    if(fetchingRef.current)return;
+    fetchingRef.current=true;
+    const cats=[...new Set(pool.map(q=>q.cat))];
+    await Promise.all(cats.map(async cat=>{
+      const existing=allQ.filter(q=>q.cat===cat).map(q=>q.q);
+      try{
+        const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({category:cat,existing})});
+        if(!r.ok)return;
+        const qs=await r.json();
+        const deduped=qs.filter(nq=>!allQ.some(eq=>norm(eq.q)===norm(nq.q)));
+        if(deduped.length>0)setXQs(p=>[...p,...deduped]);
+      }catch{}
+    }));
+    fetchingRef.current=false;
+  }
+  function nxt(){const ni=qi+1;if(ni%pool.length===0){setQue(shuf(pool));fetchMore();}setQi(ni);rst();}
   function hk(e){if(e.key==="Enter")sub?nxt():doSub();}
 
   async function doGen(){
