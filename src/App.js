@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const CATS=["2 Words – One Letter Apart","Anagrammed States","World Capitals","State Capitals","Study-ology","Etymology – Countries","Etymology – Capitals","Etymology – States","Etymology – State Capitals","English – Indian Origin","⚽ Soccer"];
+const CATS=["2 Words – One Letter Apart","Anagrammed States","World Capitals","State Capitals","Study-ology","Etymology – Countries","Etymology – Capitals","Etymology – States","Etymology – State Capitals","English – Indian Origin","⚽ Soccer","⚔️ World War I","💣 World War II"];
 const DIFFS=["easy","medium","hard"];
 const RAW=[
 [0,"A sweet baked treat  /  A body of still water",["CAKE","LAKE"],0],
@@ -166,6 +166,36 @@ const RAW=[
 [10,"⚽ Which La Liga club plays at the Wanda Metropolitano stadium?",["ATLETICO MADRID","ATLETICO DE MADRID"],2],
 [10,"⚽ Florian Wirtz plays for which Bundesliga club?",["BAYER LEVERKUSEN","BAYER 04 LEVERKUSEN"],2],
 [10,"⚽ Manchester City play their home games at which stadium?",["ETIHAD STADIUM","THE ETIHAD"],2],
+[11,"⚔️ WW1: In what year did World War I begin?",["1914"],0],
+[11,"⚔️ WW1: In what year did World War I end?",["1918"],0],
+[11,"⚔️ WW1: Which archduke's assassination in 1914 triggered World War I?",["FRANZ FERDINAND","ARCHDUKE FRANZ FERDINAND","FRANZ FERDINAND OF AUSTRIA"],0],
+[11,"⚔️ WW1: What were Germany, Austria-Hungary, and the Ottoman Empire collectively called?",["CENTRAL POWERS","THE CENTRAL POWERS"],0],
+[11,"⚔️ WW1: Name one of the main Allied Powers in WW1",["BRITAIN","FRANCE","RUSSIA","USA","UNITED STATES","UNITED KINGDOM","UK","ITALY"],0],
+[11,"⚔️ WW1: In which Bosnian city was Archduke Franz Ferdinand assassinated?",["SARAJEVO"],1],
+[11,"⚔️ WW1: What new weapon — used in the trenches — caused horrific casualties on both sides?",["POISON GAS","GAS","MUSTARD GAS","CHEMICAL WEAPONS"],1],
+[11,"⚔️ WW1: The famous British ocean liner sunk by Germany in 1915, helping turn US opinion against Germany?",["LUSITANIA","RMS LUSITANIA"],1],
+[11,"⚔️ WW1: What type of vehicle — a heavily armoured tracked machine — was first used in battle in WW1?",["TANK","TANKS"],1],
+[11,"⚔️ WW1: The peace treaty that formally ended WW1 was signed in which French palace?",["VERSAILLES","PALACE OF VERSAILLES"],1],
+[11,"⚔️ WW1: What nickname was given to the German flying ace Manfred von Richthofen?",["RED BARON","THE RED BARON"],2],
+[11,"⚔️ WW1: What was the secret German telegram to Mexico, offering US territory if Mexico attacked America?",["ZIMMERMANN TELEGRAM","ZIMMERMANN NOTE","ZIMMERMAN TELEGRAM"],2],
+[11,"⚔️ WW1: Which Russian tsar was overthrown during WW1, ending centuries of royal rule?",["NICHOLAS II","TSAR NICHOLAS II","TSAR NICHOLAS"],2],
+[11,"⚔️ WW1: The bloodiest battle of WW1 — fought in France in 1916 along a river — was the Battle of the…?",["SOMME","BATTLE OF THE SOMME"],2],
+[11,"⚔️ WW1: What four-letter word describes the new style of combat where soldiers dug lines into the ground?",["TRENCH"],2],
+[12,"💣 WW2: In what year did World War II begin?",["1939"],0],
+[12,"💣 WW2: In what year did World War II end?",["1945"],0],
+[12,"💣 WW2: Who was the leader of Nazi Germany during World War II?",["ADOLF HITLER","HITLER"],0],
+[12,"💣 WW2: Which country dropped atomic bombs on Japan to end the war in 1945?",["UNITED STATES","USA","AMERICA","THE UNITED STATES"],0],
+[12,"💣 WW2: Who was Britain's Prime Minister for most of World War II?",["WINSTON CHURCHILL","CHURCHILL"],0],
+[12,"💣 WW2: What was the surprise Japanese attack in December 1941 that brought the USA into WW2?",["PEARL HARBOR","ATTACK ON PEARL HARBOR","BOMBING OF PEARL HARBOR"],1],
+[12,"💣 WW2: What was the German word for 'lightning war' — their fast invasion strategy?",["BLITZKRIEG"],1],
+[12,"💣 WW2: Which Japanese city was hit by the first atomic bomb ever used in war, in August 1945?",["HIROSHIMA"],1],
+[12,"💣 WW2: What date in June 1944 is known as 'D-Day', when Allies landed in Normandy?",["JUNE 6","JUNE 6TH","6 JUNE","D-DAY","6TH JUNE"],1],
+[12,"💣 WW2: Which country did Germany invade on September 1, 1939, starting World War II?",["POLAND"],1],
+[12,"💣 WW2: What was the code name for Germany's 1941 invasion of the Soviet Union?",["OPERATION BARBAROSSA","BARBAROSSA"],2],
+[12,"💣 WW2: What was the name of the German cipher machine whose codes the Allies secretly cracked?",["ENIGMA","ENIGMA MACHINE"],2],
+[12,"💣 WW2: Who was the leader of the Soviet Union during World War II?",["JOSEPH STALIN","STALIN"],2],
+[12,"💣 WW2: The 1938 agreement that let Hitler take part of Czechoslovakia without a fight was signed in which city?",["MUNICH"],2],
+[12,"💣 WW2: Which Japanese admiral planned and led the attack on Pearl Harbor?",["YAMAMOTO","ISOROKU YAMAMOTO"],2],
 ];
 
 const Q=RAW.map(([c,q,a,d])=>({cat:CATS[c],q,a,d:DIFFS[d]}));
