@@ -546,18 +546,17 @@ export default function App(){
 
   return(
     <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:12}}>
-      <div style={{background:"white",borderRadius:28,padding:"17px 17px 22px",maxWidth:560,width:"100%",boxShadow:"0 24px 64px rgba(0,0,0,.3)"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-          <span style={{background:col.bg,color:"white",borderRadius:20,padding:"3px 10px",fontSize:12,fontWeight:700,maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{q.cat}</span>
-          <div style={{display:"flex",gap:5,alignItems:"center"}}>
-            <span style={{background:"#f0f0f0",borderRadius:10,padding:"3px 7px",fontSize:13,fontWeight:700,color:"#555"}}>✅{cor}</span>
-            <span style={{background:"#f0f0f0",borderRadius:10,padding:"3px 7px",fontSize:13,fontWeight:700,color:"#555"}}>📊{pct}%</span>
-            <span style={{background:str>=3?"#fff3cd":"#f0f0f0",borderRadius:10,padding:"3px 7px",fontSize:13,fontWeight:700,color:str>=3?"#856404":"#555"}}>🔥{str}</span>
-            {profile&&<button onClick={()=>{setProfile(null);setSc("who");}} title={`Switch from ${profile.name}`} style={{width:30,height:30,borderRadius:"50%",background:"#7C83FD",border:"none",color:"white",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center"}}>{profile.name[0].toUpperCase()}</button>}
-            <button onClick={openMenu} style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"4px 8px",cursor:"pointer",fontSize:17,lineHeight:1,marginLeft:2}}>☰</button>
+      <div style={{background:"white",borderRadius:28,padding:"11px 14px 16px",maxWidth:560,width:"100%",boxShadow:"0 24px 64px rgba(0,0,0,.3)"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+          <span style={{background:col.bg,color:"white",borderRadius:20,padding:"3px 9px",fontSize:12,fontWeight:700,maxWidth:140,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{q.cat}</span>
+          <div style={{display:"flex",gap:4,alignItems:"center"}}>
+            <span style={{background:"#f0f0f0",borderRadius:10,padding:"2px 6px",fontSize:12,fontWeight:700,color:"#555"}}>✅{cor}</span>
+            <span style={{background:str>=3?"#fff3cd":"#f0f0f0",borderRadius:10,padding:"2px 6px",fontSize:12,fontWeight:700,color:str>=3?"#856404":"#555"}}>🔥{str}</span>
+            {profile&&<button onClick={()=>{setProfile(null);setSc("who");}} title={`Switch from ${profile.name}`} style={{width:28,height:28,borderRadius:"50%",background:"#7C83FD",border:"none",color:"white",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center"}}>{profile.name[0].toUpperCase()}</button>}
+            <button onClick={openMenu} style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:16,lineHeight:1}}>☰</button>
           </div>
         </div>
-        <div style={{display:"flex",gap:5,justifyContent:"center",marginBottom:8}}>
+        <div style={{display:"flex",gap:5,justifyContent:"center",marginBottom:5}}>
           {LVS.map(L=>{
             const locked=!unlk.includes(L.id),sel=lv===L.id;
             return(
@@ -567,19 +566,19 @@ export default function App(){
             );
           })}
         </div>
-        <div style={{textAlign:"right",fontSize:12,color:"#ccc",marginBottom:9}}>Question #{tot+1}</div>
-        <div style={{background:col.lt,border:`2px solid ${col.bg}33`,borderRadius:17,padding:"16px 14px",marginBottom:12,minHeight:65,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4}}>
+        <div style={{textAlign:"right",fontSize:12,color:"#ccc",marginBottom:5}}>Question #{tot+1}</div>
+        <div style={{background:col.lt,border:`2px solid ${col.bg}33`,borderRadius:17,padding:"12px 12px",marginBottom:8,minHeight:50,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3}}>
           <p style={{color:"#333",fontSize:19,margin:0,textAlign:"center",lineHeight:1.7,fontWeight:600}}>{q.q}</p>
           {q.cat===CATS[0]&&<p style={{color:col.bg,fontSize:13,margin:0,fontWeight:700}}>Type both words — e.g. CAT BAT</p>}
         </div>
         {!sub&&(
-          <div style={{textAlign:"center",marginBottom:9}}>
+          <div style={{textAlign:"center",marginBottom:6}}>
             {shint?<span style={{color:"#aaa",fontSize:14,letterSpacing:2}}>{mkHint(q)}</span>
             :<button onClick={()=>setShint(true)} style={{background:"none",border:"none",color:col.bg,fontSize:14,cursor:"pointer",fontFamily:"inherit",fontWeight:700,textDecoration:"underline"}}>💡 Show hint</button>}
           </div>
         )}
         {!sub&&(
-          <div style={{display:"flex",gap:7,marginBottom:9}}>
+          <div style={{display:"flex",gap:7,marginBottom:6}}>
             <input ref={iRef} value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={hk} placeholder="Type your answer…" style={{flex:1,border:`2.5px solid ${col.bg}`,borderRadius:13,padding:"11px 13px",fontSize:19,fontFamily:"inherit",outline:"none",color:"#333"}}/>
             <button onClick={doSub} disabled={!inp.trim()} style={{background:inp.trim()?`linear-gradient(135deg,${col.bg},#764ba2)`:"#ddd",color:"white",border:"none",borderRadius:13,padding:"0 15px",fontSize:22,cursor:inp.trim()?"pointer":"default",fontFamily:"inherit",fontWeight:700}}>✓</button>
           </div>
