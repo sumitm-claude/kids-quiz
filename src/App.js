@@ -336,6 +336,12 @@ export default function App(){
   const[shint,setShint]=useState(false);
   const[msg,setMsg]=useState("");
   const[anm,setAnm]=useState("");
+  const[showStats,setShowStats]=useState(false);
+  const[showCats,setShowCats]=useState(false);
+  const[expl,setExpl]=useState("");
+  const[explLoading,setExplLoading]=useState(false);
+  const[newAvatarIdx,setNewAvatarIdx]=useState(0);
+  const[avatarIdx,setAvatarIdx]=useState(0);
   const iRef=useRef(null);
   const fetchingRef=useRef(false);
 
@@ -364,7 +370,7 @@ export default function App(){
   },[cor]);
   useEffect(()=>{if(sc==="quiz"&&!sub&&iRef.current)iRef.current.focus();},[qi,sub,sc]);
 
-  function rst(){setInp("");setSub(false);setIsOk(false);setShint(false);setMsg("");setAnm("");}
+  function rst(){setInp("");setSub(false);setIsOk(false);setShint(false);setMsg("");setAnm("");setExpl("");setExplLoading(false);}
   function openMenu(){if(!pin)setPsc("setup");else setPsc("enter");}
   function toggleCat(c){const cur=actC||allC;if(cur.length===1&&cur[0]===c)return;setActC(cur.includes(c)?cur.filter(x=>x!==c):[...cur,c]);}
 
@@ -395,10 +401,11 @@ export default function App(){
   function hk(e){if(e.key==="Enter")sub?nxt():doSub();}
 
   function saveProfile(updates){if(!profile)return;fetch('/api/profile/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:profile.id,...updates})}).catch(()=>{});}
-  function applyProfile(p){setUnlk(p.unlocked);setLv(p.level);setCor(p.correct);setBst(p.best_streak);setProfile(p);setTot(0);setStr(0);const u=[{name:p.name,pin:p.pin},...recents.filter(r=>r.pin!==p.pin)].slice(0,4);setRecents(u);lsSet('kq_recents',u);setSc('quiz');}
+  function applyProfile(p){setUnlk(p.unlocked);setLv(p.level);setCor(p.correct);setBst(p.best_streak);setProfile(p);setTot(0);setStr(0);const u=[{name:p.name,pin:p.pin},...recents.filter(r=>r.pin!==p.pin)].slice(0,4);setRecents(u);lsSet('kq_recents',u);const avMap=ls('kq_avmap',{});setAvatarIdx(avMap[p.pin]||0);setSc('quiz');}
   async function fetchProfile(pin){setProfileLoading(true);setLoginErr('');try{const r=await fetch('/api/profile/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})});if(!r.ok){setLoginErr('PIN not found. Try again.');setLoginDigs([]);return;}const p=await r.json();applyProfile(p);}catch{setLoginErr('Connection error. Try again.');setLoginDigs([]);}finally{setProfileLoading(false);}}
-  async function doCreate(){if(!newName.trim()||profileLoading)return;setProfileLoading(true);try{const r=await fetch('/api/profile/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:newName.trim()})});const p=await r.json();setNewPin(p.pin);applyProfile(p);}catch{}finally{setProfileLoading(false);}}
+  async function doCreate(){if(!newName.trim()||profileLoading)return;setProfileLoading(true);try{const r=await fetch('/api/profile/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:newName.trim()})});const p=await r.json();const avMap=ls('kq_avmap',{});lsSet('kq_avmap',{...avMap,[p.pin]:newAvatarIdx});setAvatarIdx(newAvatarIdx);setNewPin(p.pin);applyProfile(p);}catch{}finally{setProfileLoading(false);}}
   function pressLoginDig(n){if(loginDigs.length>=4||profileLoading)return;const nd=[...loginDigs,String(n)];setLoginDigs(nd);if(nd.length===4)fetchProfile(nd.join(''));}
+  function doSkip(){if(sub||!q)return;setIsOk(false);setStr(0);setMsg("No worries! 👀");setSub(true);}
   function changeLv(v){setLv(v);saveProfile({correct:cor,best_streak:bst,unlocked:unlk,level:v});}
 
   async function doGen(){
@@ -457,7 +464,13 @@ export default function App(){
             <h2 style={{color:"white",fontSize:26,margin:"0 0 4px"}}>New Quizzer</h2>
             <p style={{color:"rgba(255,255,255,.7)",fontSize:15,margin:"0 0 20px"}}>What's your name?</p>
             <div style={{background:"white",borderRadius:24,padding:"24px 20px",boxShadow:"0 24px 64px rgba(0,0,0,.3)"}}>
-              <input autoFocus value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&doCreate()} placeholder="Your name…" style={{width:"100%",border:"2.5px solid #7C83FD",borderRadius:11,padding:"11px 13px",fontSize:20,fontFamily:"inherit",outline:"none",color:"#333",boxSizing:"border-box",marginBottom:12}}/>
+              <input autoFocus value={newName} onChange={e=>setNewName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&doCreate()} placeholder="Your name…" style={{width:"100%",border:"2.5px solid #7C83FD",borderRadius:11,padding:"11px 13px",fontSize:20,fontFamily:"inherit",outline:"none",color:"#333",boxSizing:"border-box",marginBottom:14}}/>
+              <p style={{fontSize:12,color:"#bbb",fontWeight:700,margin:"0 0 8px",textAlign:"center",letterSpacing:.5}}>PICK YOUR COLOUR</p>
+              <div style={{display:"flex",justifyContent:"center",gap:8,flexWrap:"wrap",marginBottom:14}}>
+                {PAL.slice(0,8).map((p,i)=>(
+                  <button key={i} onClick={()=>setNewAvatarIdx(i)} style={{width:38,height:38,borderRadius:"50%",background:p.bg,border:newAvatarIdx===i?"3px solid #333":"3px solid transparent",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:16,fontWeight:800,transition:"transform .1s",transform:newAvatarIdx===i?"scale(1.15)":"scale(1)"}}>{newAvatarIdx===i?"✓":""}</button>
+                ))}
+              </div>
               <button onClick={doCreate} disabled={!newName.trim()||profileLoading} style={{width:"100%",background:newName.trim()&&!profileLoading?"linear-gradient(135deg,#7C83FD,#764ba2)":"#ddd",color:"white",border:"none",borderRadius:13,padding:"13px 0",fontSize:18,cursor:newName.trim()&&!profileLoading?"pointer":"default",fontFamily:"inherit",fontWeight:800}}>{profileLoading?"Creating…":"Start! →"}</button>
             </div>
             <button onClick={()=>{setSc("who");setNewName('');}} style={{marginTop:14,background:"rgba(255,255,255,.2)",border:"none",color:"white",borderRadius:12,padding:"10px 20px",fontSize:15,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>← Back</button>
@@ -548,11 +561,11 @@ export default function App(){
     <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:12}}>
       <div style={{background:"white",borderRadius:28,padding:"11px 14px 16px",maxWidth:560,width:"100%",boxShadow:"0 24px 64px rgba(0,0,0,.3)"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
-          <span style={{background:col.bg,color:"white",borderRadius:20,padding:"3px 9px",fontSize:12,fontWeight:700,maxWidth:140,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{q.cat}</span>
+          <button onClick={()=>setShowCats(true)} style={{background:col.bg,color:"white",borderRadius:20,padding:"3px 9px",fontSize:12,fontWeight:700,maxWidth:140,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",border:"none",cursor:"pointer",fontFamily:"inherit"}}>{q.cat} ▾</button>
           <div style={{display:"flex",gap:4,alignItems:"center"}}>
             <span style={{background:"#f0f0f0",borderRadius:10,padding:"2px 6px",fontSize:12,fontWeight:700,color:"#555"}}>✅{cor}</span>
             <span style={{background:str>=3?"#fff3cd":"#f0f0f0",borderRadius:10,padding:"2px 6px",fontSize:12,fontWeight:700,color:str>=3?"#856404":"#555"}}>🔥{str}</span>
-            {profile&&<button onClick={()=>{setProfile(null);setSc("who");}} title={`Switch from ${profile.name}`} style={{width:28,height:28,borderRadius:"50%",background:"#7C83FD",border:"none",color:"white",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center"}}>{profile.name[0].toUpperCase()}</button>}
+            {profile&&<button onClick={()=>setShowStats(true)} title={`${profile.name}'s stats`} style={{width:28,height:28,borderRadius:"50%",background:PAL[avatarIdx].bg,border:"none",color:"white",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center"}}>{profile.name[0].toUpperCase()}</button>}
             <button onClick={openMenu} style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:16,lineHeight:1}}>☰</button>
           </div>
         </div>
@@ -566,20 +579,23 @@ export default function App(){
             );
           })}
         </div>
+        {(()=>{const nx=LVS.find(L=>!unlk.includes(L.id));if(!nx)return null;const from=LVS[LVS.indexOf(nx)-1]?.at||0;const pct2=Math.min(100,Math.max(0,Math.round(((cor-from)/(nx.at-from))*100)));return(<div style={{marginBottom:5}}><div style={{fontSize:11,color:"#aaa",textAlign:"center",marginBottom:3}}>{nx.at-cor} more correct to unlock {nx.em} {nx.lbl}</div><div style={{height:5,background:"#f0f0f0",borderRadius:3,overflow:"hidden"}}><div style={{height:5,background:nx.col,borderRadius:3,width:`${pct2}%`,transition:"width .5s"}}/></div></div>)})()}
         <div style={{textAlign:"right",fontSize:12,color:"#ccc",marginBottom:5}}>Question #{tot+1}</div>
         <div style={{background:col.lt,border:`2px solid ${col.bg}33`,borderRadius:17,padding:"12px 12px",marginBottom:8,minHeight:50,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3}}>
           <p style={{color:"#333",fontSize:19,margin:0,textAlign:"center",lineHeight:1.7,fontWeight:600}}>{q.q}</p>
           {q.cat===CATS[0]&&<p style={{color:col.bg,fontSize:13,margin:0,fontWeight:700}}>Type both words — e.g. CAT BAT</p>}
         </div>
         {!sub&&(
-          <div style={{textAlign:"center",marginBottom:6}}>
-            {shint?<span style={{color:"#aaa",fontSize:14,letterSpacing:2}}>{mkHint(q)}</span>
-            :<button onClick={()=>setShint(true)} style={{background:"none",border:"none",color:col.bg,fontSize:14,cursor:"pointer",fontFamily:"inherit",fontWeight:700,textDecoration:"underline"}}>💡 Show hint</button>}
+          <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:14,marginBottom:6}}>
+            {shint
+              ?<span style={{color:"#aaa",fontSize:14,letterSpacing:2}}>{mkHint(q)}</span>
+              :<button onClick={()=>setShint(true)} style={{background:"none",border:"none",color:col.bg,fontSize:14,cursor:"pointer",fontFamily:"inherit",fontWeight:700,textDecoration:"underline"}}>💡 Show hint</button>}
+            {!shint&&<button onClick={doSkip} style={{background:"none",border:"none",color:"#bbb",fontSize:14,cursor:"pointer",fontFamily:"inherit",fontWeight:700,textDecoration:"underline"}}>🤷 I don't know</button>}
           </div>
         )}
         {!sub&&(
           <div style={{display:"flex",gap:7,marginBottom:6}}>
-            <input ref={iRef} value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={hk} placeholder="Type your answer…" style={{flex:1,border:`2.5px solid ${col.bg}`,borderRadius:13,padding:"11px 13px",fontSize:19,fontFamily:"inherit",outline:"none",color:"#333"}}/>
+            <input ref={iRef} value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={hk} onFocus={()=>iRef.current?.scrollIntoView({behavior:"smooth",block:"center"})} placeholder="Type your answer…" style={{flex:1,border:`2.5px solid ${col.bg}`,borderRadius:13,padding:"11px 13px",fontSize:19,fontFamily:"inherit",outline:"none",color:"#333"}}/>
             <button onClick={doSub} disabled={!inp.trim()} style={{background:inp.trim()?`linear-gradient(135deg,${col.bg},#764ba2)`:"#ddd",color:"white",border:"none",borderRadius:13,padding:"0 15px",fontSize:22,cursor:inp.trim()?"pointer":"default",fontFamily:"inherit",fontWeight:700}}>✓</button>
           </div>
         )}
@@ -587,11 +603,50 @@ export default function App(){
           <div style={{textAlign:"center"}}>
             <div style={{fontSize:24,fontWeight:700,marginBottom:5,color:isOk?"#28a745":"#dc3545",animation:anm==="pop"?"pop .4s ease":anm==="wiggle"?"wiggle .45s ease":"none"}}>{msg}</div>
             {str>=3&&isOk&&<div style={{fontSize:14,color:"#e67e22",fontWeight:700,marginBottom:3}}>🔥 {str} in a row!</div>}
-            {!isOk&&<div style={{fontSize:16,color:"#666",marginBottom:7}}>Answer: <strong style={{color:"#28a745"}}>{q.a[0]}</strong></div>}
+            {!isOk&&<div style={{marginBottom:7}}>
+              <div style={{fontSize:16,color:"#666"}}>Answer: <strong style={{color:"#28a745"}}>{q.a[0]}</strong></div>
+              {expl?<div style={{fontSize:13,color:"#888",marginTop:5,fontStyle:"italic",lineHeight:1.5}}>{expl}</div>
+              :explLoading?<div style={{fontSize:13,color:"#aaa",marginTop:4}}>Thinking…</div>
+              :<button onClick={async()=>{setExplLoading(true);try{const r=await fetch('/api/explain',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:q.q,a:q.a[0],cat:q.cat})});const d=await r.json();setExpl(d.explanation);}catch{setExpl("No explanation available.");}finally{setExplLoading(false);}}} style={{background:"none",border:"none",color:"#7C83FD",fontSize:13,cursor:"pointer",fontFamily:"inherit",fontWeight:700,textDecoration:"underline",marginTop:4,display:"block"}}>Why? 💡</button>}
+            </div>}
             <button onClick={nxt} style={{background:`linear-gradient(135deg,${col.bg},#764ba2)`,color:"white",border:"none",borderRadius:16,padding:"11px 24px",fontSize:18,cursor:"pointer",fontFamily:"inherit",fontWeight:700,boxShadow:"0 4px 16px rgba(0,0,0,.18)"}}>Next Question →</button>
           </div>
         )}
       </div>
+      {showStats&&profile&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.75)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:200,padding:20}}>
+          <div style={{background:"white",borderRadius:28,padding:"26px 22px",maxWidth:320,width:"100%",textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,.4)"}}>
+            <div style={{width:68,height:68,borderRadius:"50%",background:PAL[avatarIdx].bg,color:"white",fontSize:32,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 10px"}}>{profile.name[0].toUpperCase()}</div>
+            <h2 style={{margin:"0 0 2px",fontSize:22,color:"#333"}}>{profile.name}</h2>
+            <p style={{color:"#bbb",fontSize:13,margin:"0 0 16px"}}>PIN: {profile.pin}</p>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+              <div style={{background:"#f8f8f8",borderRadius:14,padding:"12px 8px"}}><div style={{fontSize:26,fontWeight:800,color:"#333"}}>{cor}</div><div style={{fontSize:11,color:"#aaa",fontWeight:700}}>CORRECT</div></div>
+              <div style={{background:"#f8f8f8",borderRadius:14,padding:"12px 8px"}}><div style={{fontSize:26,fontWeight:800,color:"#333"}}>{bst}</div><div style={{fontSize:11,color:"#aaa",fontWeight:700}}>BEST STREAK</div></div>
+            </div>
+            <div style={{display:"flex",justifyContent:"center",gap:7,marginBottom:18}}>
+              {LVS.map(L=><span key={L.id} style={{background:unlk.includes(L.id)?L.col+"22":"#f5f5f5",color:unlk.includes(L.id)?L.col:"#ccc",borderRadius:10,padding:"4px 10px",fontSize:12,fontWeight:700}}>{unlk.includes(L.id)?L.em:"🔒"} {L.lbl}</span>)}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={()=>setShowStats(false)} style={{flex:1,background:"#f0f0f0",color:"#666",border:"none",borderRadius:13,padding:"11px 0",fontSize:15,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>Close</button>
+              <button onClick={()=>{setShowStats(false);setProfile(null);setSc("who");}} style={{flex:1,background:"linear-gradient(135deg,#7C83FD,#764ba2)",color:"white",border:"none",borderRadius:13,padding:"11px 0",fontSize:15,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>Switch Player</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showCats&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",display:"flex",alignItems:"flex-end",justifyContent:"center",zIndex:200}} onClick={()=>setShowCats(false)}>
+          <div style={{background:"white",borderRadius:"24px 24px 0 0",padding:"16px 16px 32px",width:"100%",maxWidth:560,boxShadow:"0 -8px 40px rgba(0,0,0,.3)"}} onClick={e=>e.stopPropagation()}>
+            <div style={{width:40,height:4,borderRadius:2,background:"#e0e0e0",margin:"0 auto 14px"}}/>
+            <h3 style={{margin:"0 0 12px",color:"#333",fontSize:16,textAlign:"center",fontWeight:800}}>Pick Categories</h3>
+            <div style={{display:"flex",flexWrap:"wrap",gap:7,justifyContent:"center",marginBottom:16}}>
+              {allC.map(c=>{const cc=getCol(c,xC),on=(actC||allC).includes(c);return(
+                <button key={c} onClick={()=>toggleCat(c)} style={{background:on?cc.bg:"#f0f0f0",color:on?"white":"#999",border:"none",borderRadius:20,padding:"6px 13px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{c}</button>
+              );})}
+            </div>
+            <button onClick={()=>setShowCats(false)} style={{width:"100%",background:"linear-gradient(135deg,#7C83FD,#764ba2)",color:"white",border:"none",borderRadius:13,padding:"12px 0",fontSize:16,cursor:"pointer",fontFamily:"inherit",fontWeight:800}}>Done ✓</button>
+          </div>
+        </div>
+      )}
       {popup&&<UnlockModal lv={popup} onClose={(sw)=>{if(sw)changeLv(popup);setPopup(null);}}/>}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
