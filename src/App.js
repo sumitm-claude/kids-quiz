@@ -257,7 +257,7 @@ function PinPad({title,sub,onOk,cPin=null}){
   const lbl=cPin?title:phase==="e"?title:"Confirm your PIN";
   const sb=cPin?sub:phase==="e"?sub:"Enter the same PIN again";
   return(
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:20}}>
+    <div style={{minHeight:"100vh",boxSizing:"border-box",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:20}}>
       <div style={{background:"white",borderRadius:28,padding:"34px 26px",maxWidth:300,width:"100%",textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,.3)"}}>
         <div style={{fontSize:42,marginBottom:8}}>🔐</div>
         <h2 style={{color:"#333",margin:"0 0 4px",fontSize:23}}>{lbl}</h2>
@@ -423,7 +423,7 @@ export default function App(){
   }
 
   if(newPin)return(
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:20}}>
+    <div style={{minHeight:"100vh",boxSizing:"border-box",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:20}}>
       <div style={{background:"white",borderRadius:28,padding:"34px 24px",maxWidth:340,width:"100%",textAlign:"center",boxShadow:"0 24px 64px rgba(0,0,0,.3)"}}>
         <div style={{fontSize:52,marginBottom:8}}>🎉</div>
         <h2 style={{color:"#333",margin:"0 0 6px",fontSize:24}}>Hi {profile?.name}!</h2>
@@ -436,7 +436,7 @@ export default function App(){
     </div>
   );
   if(sc==="who"||sc==="newq"||sc==="pinlogin")return(
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:20}}>
+    <div style={{minHeight:"100vh",boxSizing:"border-box",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:20}}>
       <div style={{maxWidth:400,width:"100%",textAlign:"center"}}>
         {sc==="pinlogin"?(
           <>
@@ -506,7 +506,7 @@ export default function App(){
   if(psc==="enter")return <PinPad title="Parent Access" sub="Enter your PIN to manage categories" onOk={()=>{setPsc(null);setSc("menu");}} cPin={pin}/>;
 
   if(sc==="menu")return(
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#667eea,#764ba2)",fontFamily:"'Nunito',cursive",padding:16}}>
+    <div style={{minHeight:"100vh",boxSizing:"border-box",background:"linear-gradient(135deg,#667eea,#764ba2)",fontFamily:"'Nunito',cursive",padding:16}}>
       <div style={{maxWidth:540,margin:"0 auto"}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
           <button onClick={()=>setSc("quiz")} style={{background:"rgba(255,255,255,.2)",border:"none",borderRadius:12,padding:"7px 14px",color:"white",fontSize:19,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>← Back</button>
@@ -544,7 +544,7 @@ export default function App(){
   );
 
   if(!q)return(
-    <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"linear-gradient(135deg,#667eea,#764ba2)",color:"white",fontFamily:"'Nunito',cursive",textAlign:"center",padding:20}}>
+    <div style={{minHeight:"100vh",boxSizing:"border-box",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"linear-gradient(135deg,#667eea,#764ba2)",color:"white",fontFamily:"'Nunito',cursive",textAlign:"center",padding:20}}>
       <div style={{fontSize:42,marginBottom:10}}>😅</div>
       <p style={{fontSize:20,margin:"0 0 5px",fontWeight:700}}>No {lv} questions active!</p>
       <p style={{fontSize:16,opacity:.8,margin:"0 0 16px"}}>Switch level or enable more categories.</p>
@@ -558,7 +558,7 @@ export default function App(){
   );
 
   return(
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:12}}>
+    <div style={{minHeight:"100vh",boxSizing:"border-box",background:"linear-gradient(135deg,#667eea,#764ba2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Nunito',cursive",padding:12}}>
       <div style={{background:"white",borderRadius:28,padding:"11px 14px 16px",maxWidth:560,width:"100%",boxShadow:"0 24px 64px rgba(0,0,0,.3)"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
           <button onClick={()=>setShowCats(true)} style={{background:col.bg,color:"white",borderRadius:20,padding:"3px 9px",fontSize:12,fontWeight:700,maxWidth:140,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",border:"none",cursor:"pointer",fontFamily:"inherit"}}>{q.cat} ▾</button>
