@@ -275,7 +275,7 @@ function PinPad({title,sub,onOk,cPin=null}){
         </div>
         {err&&<p style={{color:"#dc3545",fontSize:14,margin:0,fontWeight:600}}>{err}</p>}
       </div>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');*,*::before,*::after{box-sizing:border-box;}html,body,#root{margin:0;padding:0;}@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}`}</style>
     </div>
   );
 }
@@ -432,7 +432,7 @@ export default function App(){
         <p style={{color:"#aaa",fontSize:13,margin:"0 0 20px"}}>You'll need this to play on a different device.</p>
         <button onClick={()=>setNewPin(null)} style={{background:"linear-gradient(135deg,#7C83FD,#764ba2)",color:"white",border:"none",borderRadius:14,padding:"13px 28px",fontSize:18,cursor:"pointer",fontFamily:"inherit",fontWeight:800,width:"100%"}}>Let's play! →</button>
       </div>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');*,*::before,*::after{box-sizing:border-box;}html,body,#root{margin:0;padding:0;}`}</style>
     </div>
   );
   if(sc==="who"||sc==="newq"||sc==="pinlogin")return(
@@ -499,7 +499,7 @@ export default function App(){
           </>
         )}
       </div>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');*,*::before,*::after{box-sizing:border-box;}html,body,#root{margin:0;padding:0;}`}</style>
     </div>
   );
   if(psc==="setup")return <PinPad title="Create a Parent PIN" sub="Kids won't be able to change settings" onOk={(c)=>{setPin(c);setPsc(null);setSc("menu");}}/>;
@@ -650,6 +650,8 @@ export default function App(){
       {popup&&<UnlockModal lv={popup} onClose={(sw)=>{if(sw)changeLv(popup);setPopup(null);}}/>}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        *,*::before,*::after{box-sizing:border-box;}
+        html,body,#root{margin:0;padding:0;height:100%;}
         @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
         @keyframes wiggle{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
         @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
