@@ -1,5 +1,6 @@
 import {useState,useEffect,useRef} from 'react';
 import {ls,lsSet,PAL} from '../data/quizData';
+import {playCorrect,playWrong,playUnlock,isSoundOn,toggleSound} from '../utils/sound';
 
 const ACC='#34D399',ACC2='#059669';
 const TABLES=Array.from({length:15},(_,i)=>i+1);
@@ -41,9 +42,11 @@ export default function MathTables({profile,avatarIdx,onBack}){
   const[isOk,setIsOk]=useState(false);
   const[anm,setAnm]=useState('');
   const[bests,setBests]=useState(()=>ls('kq_math_best',{blitz:{},missing:{},gauntlet:{}}));
+  const[soundOn,setSoundOnUi]=useState(()=>isSoundOn());
   const iRef=useRef(null);
 
   useEffect(()=>{lsSet('kq_math_best',bests);},[bests]);
+  function toggleSoundUi(){setSoundOnUi(toggleSound());}
   useEffect(()=>{if((screen==='blitz'||screen==='round')&&!sub&&iRef.current)iRef.current.focus();},[q,idx,sub,screen]);
 
   useEffect(()=>{
@@ -75,14 +78,16 @@ export default function MathTables({profile,avatarIdx,onBack}){
 
   function finishBlitz(){
     const key=tablesKey(tables);
+    const isNew=score>0&&score>=(bests.blitz[key]||0);
     setBests(b=>({...b,blitz:{...b.blitz,[key]:Math.max(b.blitz[key]||0,score)}}));
+    if(isNew)playUnlock();
     setScreen('summary');
   }
   function doSubBlitz(){
     if(!input.trim()||!q)return;
     const ok=parseInt(input,10)===q.answer;
     setAttempted(a=>a+1);
-    if(ok){setScore(s=>s+1);setAnm('pop');}else setAnm('wiggle');
+    if(ok){setScore(s=>s+1);setAnm('pop');playCorrect();}else{setAnm('wiggle');playWrong();}
     setInput('');
     setQ(pickQuestion(tables,'standard'));
     setTimeout(()=>setAnm(''),350);
@@ -94,17 +99,21 @@ export default function MathTables({profile,avatarIdx,onBack}){
     if(sub||!input.trim()||!roundQ)return;
     const ok=parseInt(input,10)===roundQ.answer;
     setIsOk(ok);
-    if(ok){setScore(s=>s+1);setAnm('pop');}else setAnm('wiggle');
+    if(ok){setScore(s=>s+1);setAnm('pop');playCorrect();}else{setAnm('wiggle');playWrong();}
     setSub(true);
   }
   function next(){
     if(idx+1>=round.length){
+      let isNew=false;
       if(mode==='missing'){
         const key=tablesKey(tables);
+        isNew=score>0&&score>=(bests.missing[key]||0);
         setBests(b=>({...b,missing:{...b.missing,[key]:Math.max(b.missing[key]||0,score)}}));
       }else{
+        isNew=score>0&&score>=(bests.gauntlet.best||0);
         setBests(b=>({...b,gauntlet:{best:Math.max(b.gauntlet.best||0,score)}}));
       }
+      if(isNew)playUnlock();
       setScreen('summary');
     }else{
       setIdx(i=>i+1);resetQ();
@@ -128,6 +137,7 @@ export default function MathTables({profile,avatarIdx,onBack}){
               <div style={{color:"white",fontWeight:800,fontSize:18}}>✖️ Math Tables</div>
               <div style={{color:"rgba(255,255,255,.65)",fontSize:12}}>Type the answer</div>
             </div>
+            <button onClick={toggleSoundUi} title="Toggle sound" style={{background:"rgba(255,255,255,.15)",border:"1px solid rgba(255,255,255,.3)",color:"white",borderRadius:10,padding:"6px 9px",fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>{soundOn?"🔊":"🔇"}</button>
             <button onClick={onBack} style={{background:"rgba(255,255,255,.15)",border:"1px solid rgba(255,255,255,.3)",color:"white",borderRadius:10,padding:"6px 12px",fontSize:13,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>🏠 Hub</button>
           </div>
           <div style={{background:"white",borderRadius:24,padding:"20px 18px",boxShadow:"0 24px 64px rgba(0,0,0,.25)"}}>
@@ -173,6 +183,7 @@ export default function MathTables({profile,avatarIdx,onBack}){
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
             <span style={{background:timeLeft<=10?"#fdecea":"#f0f0f0",color:timeLeft<=10?"#dc3545":"#666",borderRadius:10,padding:"4px 10px",fontSize:16,fontWeight:800}}>⏱ {timeLeft}s</span>
             <span style={{background:"#f0fdf7",borderRadius:10,padding:"4px 10px",fontSize:14,fontWeight:700,color:ACC2}}>✅ {score}</span>
+            <button onClick={toggleSoundUi} title="Toggle sound" style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:14,lineHeight:1,fontFamily:"inherit"}}>{soundOn?"🔊":"🔇"}</button>
             <button onClick={onBack} style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:14,lineHeight:1,fontFamily:"inherit",fontWeight:700,color:"#666"}}>🏠</button>
           </div>
           <div style={{background:"#fafafa",border:"2px solid #f0f0f0",borderRadius:18,padding:"24px 12px",marginBottom:14,textAlign:"center"}}>
@@ -196,6 +207,7 @@ export default function MathTables({profile,avatarIdx,onBack}){
             <span style={{background:"#f0f0f0",borderRadius:10,padding:"3px 9px",fontSize:12,fontWeight:700,color:"#666"}}>Question {idx+1}/{round.length}</span>
             <div style={{display:"flex",gap:5,alignItems:"center"}}>
               <span style={{background:"#f0fdf7",borderRadius:10,padding:"3px 9px",fontSize:12,fontWeight:700,color:ACC2}}>✅ {score}</span>
+              <button onClick={toggleSoundUi} title="Toggle sound" style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:14,lineHeight:1,fontFamily:"inherit"}}>{soundOn?"🔊":"🔇"}</button>
               <button onClick={onBack} style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:14,lineHeight:1,fontFamily:"inherit",fontWeight:700,color:"#666"}}>🏠</button>
             </div>
           </div>

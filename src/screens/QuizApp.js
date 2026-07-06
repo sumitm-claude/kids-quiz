@@ -2,6 +2,7 @@ import {useState,useEffect,useRef} from 'react';
 import {CATS,Q,PAL,getCol,shuf,norm,chk,mkHint,LVS,OKM,ERM,ls,lsSet} from '../data/quizData';
 import PinPad from '../components/PinPad';
 import UnlockModal from '../components/UnlockModal';
+import {playCorrect,playWrong,playStreak,playUnlock,isSoundOn,toggleSound} from '../utils/sound';
 
 export default function QuizApp({profile,avatarIdx,onBack,onSwitchPlayer}){
   const[pin,setPin]=useState(()=>ls('kq_pin',null));
@@ -33,6 +34,7 @@ export default function QuizApp({profile,avatarIdx,onBack,onSwitchPlayer}){
   const[showCats,setShowCats]=useState(false);
   const[expl,setExpl]=useState('');
   const[explLoading,setExplLoading]=useState(false);
+  const[soundOn,setSoundOnUi]=useState(()=>isSoundOn());
   const iRef=useRef(null);
   const fetchingRef=useRef(false);
 
@@ -52,8 +54,8 @@ export default function QuizApp({profile,avatarIdx,onBack,onSwitchPlayer}){
 
   useEffect(()=>{if(pool.length>0){setQue(shuf(pool));setQi(0);rst();}},[lv,JSON.stringify(actC)]);
   useEffect(()=>{
-    if(cor>=25&&!unlk.includes('hard')){const nu=['easy','medium','hard'];setUnlk(nu);setPopup('hard');saveProfile({correct:cor,best_streak:bst,unlocked:nu,level:lv});}
-    else if(cor>=10&&!unlk.includes('medium')){const nu=['easy','medium'];setUnlk(nu);setPopup('medium');saveProfile({correct:cor,best_streak:bst,unlocked:nu,level:lv});}
+    if(cor>=25&&!unlk.includes('hard')){const nu=['easy','medium','hard'];setUnlk(nu);setPopup('hard');playUnlock();saveProfile({correct:cor,best_streak:bst,unlocked:nu,level:lv});}
+    else if(cor>=10&&!unlk.includes('medium')){const nu=['easy','medium'];setUnlk(nu);setPopup('medium');playUnlock();saveProfile({correct:cor,best_streak:bst,unlocked:nu,level:lv});}
   },[cor]);
   useEffect(()=>{if(sc==='quiz'&&!sub&&iRef.current)iRef.current.focus();},[qi,sub,sc]);
 
@@ -64,10 +66,11 @@ export default function QuizApp({profile,avatarIdx,onBack,onSwitchPlayer}){
   function doSub(){
     if(sub||!inp.trim()||!q)return;
     const ok=chk(inp,q);setIsOk(ok);setTot(t=>t+1);
-    if(ok){const nc=cor+1;setCor(nc);const ns=str+1;setStr(ns);const nb=Math.max(bst,ns);setBst(nb);setMsg(OKM[~~(Math.random()*OKM.length)]);setAnm('pop');saveProfile({correct:nc,best_streak:nb,unlocked:unlk,level:lv});}
-    else{setStr(0);setMsg(ERM[~~(Math.random()*ERM.length)]);setAnm('wiggle');}
+    if(ok){const nc=cor+1;setCor(nc);const ns=str+1;setStr(ns);const nb=Math.max(bst,ns);setBst(nb);setMsg(OKM[~~(Math.random()*OKM.length)]);setAnm('pop');saveProfile({correct:nc,best_streak:nb,unlocked:unlk,level:lv});ns>=3?playStreak():playCorrect();}
+    else{setStr(0);setMsg(ERM[~~(Math.random()*ERM.length)]);setAnm('wiggle');playWrong();}
     setSub(true);setTimeout(()=>setAnm(''),600);
   }
+  function toggleSoundUi(){setSoundOnUi(toggleSound());}
 
   async function fetchMore(){
     if(fetchingRef.current)return;
@@ -173,6 +176,7 @@ export default function QuizApp({profile,avatarIdx,onBack,onSwitchPlayer}){
             <span style={{background:"#f0f0f0",borderRadius:10,padding:"2px 6px",fontSize:12,fontWeight:700,color:"#555"}}>✅{cor}</span>
             <span style={{background:str>=3?"#fff3cd":"#f0f0f0",borderRadius:10,padding:"2px 6px",fontSize:12,fontWeight:700,color:str>=3?"#856404":"#555"}}>🔥{str}</span>
             <button onClick={()=>setShowStats(true)} title={`${profile.name}'s stats`} style={{width:28,height:28,borderRadius:"50%",background:PAL[avatarIdx%PAL.length].bg,border:"none",color:"white",fontSize:12,fontWeight:800,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center"}}>{profile.name[0].toUpperCase()}</button>
+            <button onClick={toggleSoundUi} title="Toggle sound" style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:14,lineHeight:1,fontFamily:"inherit"}}>{soundOn?"🔊":"🔇"}</button>
             <button onClick={onBack} style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:14,lineHeight:1,fontFamily:"inherit",fontWeight:700,color:"#666"}}>🏠</button>
             <button onClick={openMenu} style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:16,lineHeight:1}}>☰</button>
           </div>

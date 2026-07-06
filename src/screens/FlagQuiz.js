@@ -1,6 +1,7 @@
 import {useState,useEffect,useRef} from 'react';
 import {FLAGS,CONTINENTS} from '../data/flagData';
 import {shuf,ls,lsSet,PAL} from '../data/quizData';
+import {playCorrect,playWrong,playUnlock,isSoundOn,toggleSound} from '../utils/sound';
 
 const ACC='#F87171',ACC2='#ef4444';
 const HINT_COST=20;
@@ -37,10 +38,13 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
   const[isOk,setIsOk]=useState(false);
   const[anm,setAnm]=useState('');
   const[bests,setBests]=useState(()=>ls('kq_flags_best',{}));
+  const[justNewBest,setJustNewBest]=useState(false);
+  const[soundOn,setSoundOnUi]=useState(()=>isSoundOn());
   const iRef=useRef(null);
 
   useEffect(()=>{lsSet('kq_flags_best',bests);},[bests]);
   useEffect(()=>{if(screen==='quiz'&&!sub&&iRef.current)iRef.current.focus();},[idx,sub,screen]);
+  function toggleSoundUi(){setSoundOnUi(toggleSound());}
 
   function pool(){
     return FLAGS.filter(f=>(difficulty==='all'||f.difficulty===difficulty)&&(continent==='all'||f.continent===continent));
@@ -51,7 +55,7 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
     const p=pool();
     const n=Math.min(ROUND_SIZE,p.length);
     setRound(shuf(p).slice(0,n));
-    setIdx(0);setScore(0);
+    setIdx(0);setScore(0);setJustNewBest(false);
     resetQ();
     setScreen('quiz');
   }
@@ -70,8 +74,8 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
     if(sub||!input.trim()||!country)return;
     const ok=isCorrect(input,country);
     setIsOk(ok);
-    if(ok){setScore(s=>s+maxPts);setAnm('pop');}
-    else setAnm('wiggle');
+    if(ok){setScore(s=>s+maxPts);setAnm('pop');playCorrect();}
+    else{setAnm('wiggle');playWrong();}
     setSub(true);
   }
   function doSkip(){
@@ -81,7 +85,10 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
   function next(){
     if(idx+1>=round.length){
       const key=bestKey();
+      const newBest=score>(bests[key]||0)&&score>0;
+      setJustNewBest(newBest);
       setBests(b=>({...b,[key]:Math.max(b[key]||0,score)}));
+      if(newBest)playUnlock();
       setScreen('summary');
     }else{
       setIdx(i=>i+1);resetQ();
@@ -93,7 +100,6 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
   const pct=maxScore>0?score/maxScore:0;
   const stars=pct>=.85?3:pct>=.6?2:pct>=.3?1:0;
   const prevBest=bests[bestKey()]||0;
-  const isNewBest=score>prevBest&&score>0;
 
   if(screen==='setup'){
     const avail=pool().length;
@@ -107,6 +113,7 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
               <div style={{color:"white",fontWeight:800,fontSize:18}}>🌍 Flag Quiz</div>
               <div style={{color:"rgba(255,255,255,.65)",fontSize:12}}>Type the country name</div>
             </div>
+            <button onClick={toggleSoundUi} title="Toggle sound" style={{background:"rgba(255,255,255,.15)",border:"1px solid rgba(255,255,255,.3)",color:"white",borderRadius:10,padding:"6px 9px",fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>{soundOn?"🔊":"🔇"}</button>
             <button onClick={onBack} style={{background:"rgba(255,255,255,.15)",border:"1px solid rgba(255,255,255,.3)",color:"white",borderRadius:10,padding:"6px 12px",fontSize:13,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>🏠 Hub</button>
           </div>
           <div style={{background:"white",borderRadius:24,padding:"20px 18px",boxShadow:"0 24px 64px rgba(0,0,0,.25)"}}>
@@ -142,8 +149,8 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
           <h2 style={{margin:"0 0 4px",fontSize:24,color:"#333"}}>Round Complete!</h2>
           <div style={{fontSize:32,margin:"6px 0",letterSpacing:6}}>{[1,2,3].map(i=><span key={i} style={{color:i<=stars?"#F7B731":"#eee"}}>★</span>)}</div>
           <div style={{fontSize:20,fontWeight:800,color:ACC2,marginBottom:4}}>{score} / {maxScore} pts</div>
-          {isNewBest&&<div style={{background:"#fff3cd",color:"#856404",borderRadius:12,padding:"6px 12px",fontSize:14,fontWeight:700,display:"inline-block",marginBottom:8}}>🌟 New Personal Best!</div>}
-          {!isNewBest&&prevBest>0&&<div style={{fontSize:13,color:"#999",marginBottom:8}}>Best: {prevBest} pts</div>}
+          {justNewBest&&<div style={{background:"#fff3cd",color:"#856404",borderRadius:12,padding:"6px 12px",fontSize:14,fontWeight:700,display:"inline-block",marginBottom:8}}>🌟 New Personal Best!</div>}
+          {!justNewBest&&prevBest>0&&<div style={{fontSize:13,color:"#999",marginBottom:8}}>Best: {prevBest} pts</div>}
           <div style={{display:"flex",flexDirection:"column",gap:9,marginTop:16}}>
             <button onClick={start} style={{background:`linear-gradient(135deg,${ACC},${ACC2})`,color:"white",border:"none",borderRadius:14,padding:"12px 0",fontSize:16,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>🔄 Play Again</button>
             <button onClick={()=>setScreen('setup')} style={{background:"#f5f5f5",color:"#666",border:"none",borderRadius:14,padding:"12px 0",fontSize:15,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>⚙️ Change Settings</button>
@@ -163,6 +170,7 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
           <span style={{background:"#f0f0f0",borderRadius:10,padding:"3px 9px",fontSize:12,fontWeight:700,color:"#666"}}>Question {idx+1}/{round.length}</span>
           <div style={{display:"flex",gap:5,alignItems:"center"}}>
             <span style={{background:"#fff0f0",borderRadius:10,padding:"3px 9px",fontSize:12,fontWeight:700,color:ACC2}}>⭐ {score} pts</span>
+            <button onClick={toggleSoundUi} title="Toggle sound" style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:14,lineHeight:1,fontFamily:"inherit"}}>{soundOn?"🔊":"🔇"}</button>
             <button onClick={onBack} style={{background:"#f0f0f0",border:"none",borderRadius:9,padding:"3px 7px",cursor:"pointer",fontSize:14,lineHeight:1,fontFamily:"inherit",fontWeight:700,color:"#666"}}>🏠</button>
           </div>
         </div>
