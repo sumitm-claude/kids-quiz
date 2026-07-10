@@ -1,9 +1,11 @@
 import {useState,useEffect,useRef} from 'react';
-import {ls,lsSet,PAL} from '../data/quizData';
+import {ls,lsSet,PAL,LVS} from '../data/quizData';
 import {playCorrect,playWrong,playUnlock,isSoundOn,toggleSound} from '../utils/sound';
+import UnlockModal from '../components/UnlockModal';
 
 const ACC='#34D399',ACC2='#059669';
 const TABLES=Array.from({length:15},(_,i)=>i+1);
+const TIER_TABLES={easy:[1,2,3,4,5],medium:[6,7,8,9,10],hard:[11,12,13,14,15]};
 const MULT_MAX=12;
 const ROUND_SIZE=10;
 const GAUNTLET_SIZE=30;
@@ -24,13 +26,19 @@ function pickQuestion(tables,type){
   if(Math.random()<0.5)return{text:`? × ${b} = ${product}`,answer:a,type:'missing'};
   return{text:`${a} × ? = ${product}`,answer:b,type:'missing'};
 }
-function tablesKey(sel){return sel.length===TABLES.length?'all':[...sel].sort((x,y)=>x-y).join(',');}
 function gradeFor(pct){if(pct>=90)return'A';if(pct>=80)return'B';if(pct>=70)return'C';if(pct>=60)return'D';return'F';}
 
 export default function MathTables({profile,avatarIdx,onBack}){
   const[screen,setScreen]=useState('setup');
   const[mode,setMode]=useState('blitz');
-  const[tables,setTables]=useState(TABLES);
+  const[unlk,setUnlk]=useState(()=>ls('kq_math_progress',{correct:0,unlocked:['easy']}).unlocked);
+  const[correct,setCorrect]=useState(()=>ls('kq_math_progress',{correct:0,unlocked:['easy']}).correct);
+  const[tier,setTier]=useState(()=>{
+    const saved=ls('kq_math_tier','easy');
+    const unlocked=ls('kq_math_progress',{correct:0,unlocked:['easy']}).unlocked;
+    return unlocked.includes(saved)?saved:unlocked[unlocked.length-1];
+  });
+  const[popup,setPopup]=useState(null);
   const[timeLeft,setTimeLeft]=useState(BLITZ_SECONDS);
   const[q,setQ]=useState(null);
   const[round,setRound]=useState([]);
@@ -46,7 +54,14 @@ export default function MathTables({profile,avatarIdx,onBack}){
   const iRef=useRef(null);
 
   useEffect(()=>{lsSet('kq_math_best',bests);},[bests]);
+  useEffect(()=>{lsSet('kq_math_progress',{correct,unlocked:unlk});},[correct,unlk]);
+  useEffect(()=>{lsSet('kq_math_tier',tier);},[tier]);
+  useEffect(()=>{
+    if(correct>=25&&!unlk.includes('hard')){setUnlk(['easy','medium','hard']);setPopup('hard');playUnlock();}
+    else if(correct>=10&&!unlk.includes('medium')){setUnlk(['easy','medium']);setPopup('medium');playUnlock();}
+  },[correct]);
   function toggleSoundUi(){setSoundOnUi(toggleSound());}
+  function changeTier(v){setTier(v);}
   useEffect(()=>{if((screen==='blitz'||screen==='round')&&!sub&&iRef.current)iRef.current.focus();},[q,idx,sub,screen]);
 
   useEffect(()=>{
@@ -57,18 +72,15 @@ export default function MathTables({profile,avatarIdx,onBack}){
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[screen,timeLeft]);
 
-  function toggleTable(n){
-    setTables(t=>t.includes(n)?(t.length>1?t.filter(x=>x!==n):t):[...t,n].sort((x,y)=>x-y));
-  }
   function resetQ(){setInput('');setSub(false);setIsOk(false);setAnm('');}
 
   function start(){
     if(mode==='blitz'){
       setScore(0);setAttempted(0);setTimeLeft(BLITZ_SECONDS);
-      setQ(pickQuestion(tables,'standard'));setInput('');
+      setQ(pickQuestion(TIER_TABLES[tier],'standard'));setInput('');
       setScreen('blitz');
     }else if(mode==='missing'){
-      setRound(Array.from({length:ROUND_SIZE},()=>pickQuestion(tables,'missing')));
+      setRound(Array.from({length:ROUND_SIZE},()=>pickQuestion(TIER_TABLES[tier],'missing')));
       setIdx(0);setScore(0);resetQ();setScreen('round');
     }else{
       setRound(Array.from({length:GAUNTLET_SIZE},()=>pickQuestion(TABLES,null)));
@@ -77,7 +89,7 @@ export default function MathTables({profile,avatarIdx,onBack}){
   }
 
   function finishBlitz(){
-    const key=tablesKey(tables);
+    const key=tier;
     const isNew=score>0&&score>=(bests.blitz[key]||0);
     setBests(b=>({...b,blitz:{...b.blitz,[key]:Math.max(b.blitz[key]||0,score)}}));
     if(isNew)playUnlock();
@@ -87,9 +99,9 @@ export default function MathTables({profile,avatarIdx,onBack}){
     if(!input.trim()||!q)return;
     const ok=parseInt(input,10)===q.answer;
     setAttempted(a=>a+1);
-    if(ok){setScore(s=>s+1);setAnm('pop');playCorrect();}else{setAnm('wiggle');playWrong();}
+    if(ok){setScore(s=>s+1);setAnm('pop');playCorrect();setCorrect(c=>c+1);}else{setAnm('wiggle');playWrong();}
     setInput('');
-    setQ(pickQuestion(tables,'standard'));
+    setQ(pickQuestion(TIER_TABLES[tier],'standard'));
     setTimeout(()=>setAnm(''),350);
   }
   function hkBlitz(e){if(e.key==='Enter')doSubBlitz();}
@@ -99,14 +111,14 @@ export default function MathTables({profile,avatarIdx,onBack}){
     if(sub||!input.trim()||!roundQ)return;
     const ok=parseInt(input,10)===roundQ.answer;
     setIsOk(ok);
-    if(ok){setScore(s=>s+1);setAnm('pop');playCorrect();}else{setAnm('wiggle');playWrong();}
+    if(ok){setScore(s=>s+1);setAnm('pop');playCorrect();setCorrect(c=>c+1);}else{setAnm('wiggle');playWrong();}
     setSub(true);
   }
   function next(){
     if(idx+1>=round.length){
       let isNew=false;
       if(mode==='missing'){
-        const key=tablesKey(tables);
+        const key=tier;
         isNew=score>0&&score>=(bests.missing[key]||0);
         setBests(b=>({...b,missing:{...b.missing,[key]:Math.max(b.missing[key]||0,score)}}));
       }else{
@@ -121,7 +133,7 @@ export default function MathTables({profile,avatarIdx,onBack}){
   }
   function hkRound(e){if(e.key==='Enter')sub?next():doSub();}
 
-  const key=tablesKey(tables);
+  const key=tier;
   let bestLine=null;
   if(mode==='blitz'&&bests.blitz[key])bestLine=`Best: ${bests.blitz[key]} correct in 60s`;
   if(mode==='missing'&&bests.missing[key])bestLine=`Best: ${bests.missing[key]}/${ROUND_SIZE}`;
@@ -143,28 +155,41 @@ export default function MathTables({profile,avatarIdx,onBack}){
           <div style={{background:"white",borderRadius:24,padding:"20px 18px",boxShadow:"0 24px 64px rgba(0,0,0,.25)"}}>
             <div style={{fontSize:13,color:"#999",fontWeight:700,marginBottom:8,letterSpacing:.5}}>MODE</div>
             <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:18}}>
-              {MODES.map(m=>(
-                <button key={m.id} onClick={()=>setMode(m.id)} style={{background:mode===m.id?ACC:"#f5f5f5",border:"none",borderRadius:16,padding:"12px 14px",cursor:"pointer",fontFamily:"inherit",textAlign:"left",display:"flex",alignItems:"center",gap:12}}>
-                  <span style={{fontSize:24}}>{m.em}</span>
-                  <span style={{flex:1}}>
-                    <div style={{fontWeight:800,fontSize:15,color:mode===m.id?"white":"#333"}}>{m.lbl}</div>
-                    <div style={{fontSize:12,color:mode===m.id?"rgba(255,255,255,.85)":"#999"}}>{m.desc}</div>
-                  </span>
-                </button>
-              ))}
+              {MODES.map(m=>{
+                const gLocked=m.id==='gauntlet'&&!unlk.includes('hard');
+                return(
+                  <button key={m.id} onClick={()=>!gLocked&&setMode(m.id)} style={{background:mode===m.id?ACC:"#f5f5f5",border:gLocked?"2px dashed #eee":"none",opacity:gLocked?.55:1,borderRadius:16,padding:"12px 14px",cursor:gLocked?"not-allowed":"pointer",fontFamily:"inherit",textAlign:"left",display:"flex",alignItems:"center",gap:12}}>
+                    <span style={{fontSize:24}}>{gLocked?"🔒":m.em}</span>
+                    <span style={{flex:1}}>
+                      <div style={{fontWeight:800,fontSize:15,color:mode===m.id?"white":gLocked?"#bbb":"#333"}}>{m.lbl}</div>
+                      <div style={{fontSize:12,color:mode===m.id?"rgba(255,255,255,.85)":gLocked?"#ccc":"#999"}}>{gLocked?`🔒 Unlocks at Hard (${LVS.find(l=>l.id==='hard').at}✅ correct)`:m.desc}</div>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
             {mode!=='gauntlet'&&(
               <>
-                <div style={{fontSize:13,color:"#999",fontWeight:700,marginBottom:8,letterSpacing:.5}}>TABLES</div>
-                <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:18}}>
-                  <button onClick={()=>setTables(TABLES)} style={{background:tables.length===TABLES.length?ACC:"#f5f5f5",color:tables.length===TABLES.length?"white":"#777",border:"none",borderRadius:12,padding:"7px 12px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>All</button>
-                  {TABLES.map(n=>(
-                    <button key={n} onClick={()=>toggleTable(n)} style={{background:tables.includes(n)?ACC:"#f5f5f5",color:tables.includes(n)?"white":"#777",border:"none",borderRadius:12,padding:"7px 12px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit",minWidth:34}}>{n}</button>
-                  ))}
+                <div style={{fontSize:13,color:"#999",fontWeight:700,marginBottom:8,letterSpacing:.5}}>DIFFICULTY</div>
+                <div style={{display:"flex",gap:7,flexWrap:"wrap",marginBottom:6}}>
+                  {LVS.map(L=>{
+                    const locked=!unlk.includes(L.id),sel=tier===L.id,rng=TIER_TABLES[L.id];
+                    return(
+                      <button key={L.id} onClick={()=>!locked&&changeTier(L.id)} style={{background:sel?ACC:locked?"#f5f5f5":"#f0f0f0",color:sel?"white":locked?"#ccc":"#777",border:"none",borderRadius:14,padding:"9px 14px",fontSize:14,fontWeight:700,cursor:locked?"not-allowed":"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:4}}>
+                        {locked?"🔒":L.em} {L.lbl} <span style={{fontSize:11,opacity:.75}}>({rng[0]}–{rng[rng.length-1]})</span>{locked&&<span style={{fontSize:11}}>({L.at}✅)</span>}
+                      </button>
+                    );
+                  })}
                 </div>
+                {(()=>{const nx=LVS.find(L=>!unlk.includes(L.id));if(!nx)return null;const from=LVS[LVS.indexOf(nx)-1]?.at||0;const pct=Math.min(100,Math.max(0,Math.round(((correct-from)/(nx.at-from))*100)));return(
+                  <div style={{marginBottom:18}}>
+                    <div style={{fontSize:12,color:"#aaa",textAlign:"center",marginBottom:3}}>{nx.at-correct} more correct to unlock {nx.em} {nx.lbl}</div>
+                    <div style={{height:5,background:"#f0f0f0",borderRadius:3,overflow:"hidden"}}><div style={{height:5,background:nx.col,borderRadius:3,width:`${pct}%`,transition:"width .5s"}}/></div>
+                  </div>
+                );})()}
               </>
             )}
-            {mode==='gauntlet'&&<div style={{fontSize:13,color:"#999",marginBottom:18,textAlign:"center"}}>Gauntlet always tests every table, 1–15.</div>}
+            {mode==='gauntlet'&&unlk.includes('hard')&&<div style={{fontSize:13,color:"#999",marginBottom:18,textAlign:"center"}}>Gauntlet always tests every table, 1–15.</div>}
             <div style={{background:"#f0fdf7",borderRadius:14,padding:"10px 14px",marginBottom:16,textAlign:"center"}}>
               <div style={{fontSize:14,color:"#666"}}>{bestLine||"No personal best yet — go set one!"}</div>
             </div>
@@ -194,6 +219,7 @@ export default function MathTables({profile,avatarIdx,onBack}){
             <button onClick={doSubBlitz} disabled={!input.trim()} style={{background:input.trim()?`linear-gradient(135deg,${ACC},${ACC2})`:"#ddd",color:"white",border:"none",borderRadius:13,padding:"0 15px",fontSize:20,cursor:input.trim()?"pointer":"default",fontFamily:"inherit",fontWeight:700}}>✓</button>
           </div>
         </div>
+        {popup&&<UnlockModal lv={popup} onClose={(sw)=>{if(sw)changeTier(popup);setPopup(null);}}/>}
       </div>
     );
   }
@@ -230,6 +256,7 @@ export default function MathTables({profile,avatarIdx,onBack}){
             </div>
           )}
         </div>
+        {popup&&<UnlockModal lv={popup} onClose={(sw)=>{if(sw)changeTier(popup);setPopup(null);}}/>}
       </div>
     );
   }

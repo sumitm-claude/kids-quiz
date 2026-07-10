@@ -1,12 +1,12 @@
 import {useState,useEffect,useRef} from 'react';
 import {FLAGS,CONTINENTS} from '../data/flagData';
-import {shuf,ls,lsSet,PAL} from '../data/quizData';
+import {shuf,ls,lsSet,PAL,LVS} from '../data/quizData';
 import {playCorrect,playWrong,playUnlock,isSoundOn,toggleSound} from '../utils/sound';
+import UnlockModal from '../components/UnlockModal';
 
 const ACC='#F87171',ACC2='#ef4444';
 const HINT_COST=20;
 const ROUND_SIZE=10;
-const DIFFS=[{id:'easy',lbl:'Easy',em:'🟢'},{id:'medium',lbl:'Medium',em:'🟡'},{id:'hard',lbl:'Hard',em:'🔴'},{id:'all',lbl:'All',em:'🌈'}];
 
 function normalize(s){
   return s.normalize('NFD').replace(/\p{Diacritic}/gu,'').toUpperCase().replace(/[^A-Z0-9 ]/g,'').replace(/\s+/g,' ').trim();
@@ -26,7 +26,15 @@ function hintText(country,n){
 
 export default function FlagQuiz({profile,avatarIdx,onBack}){
   const[screen,setScreen]=useState('setup');
-  const[difficulty,setDifficulty]=useState('easy');
+  const[unlk,setUnlk]=useState(()=>ls('kq_flags_progress',{correct:0,unlocked:['easy']}).unlocked);
+  const[correct,setCorrect]=useState(()=>ls('kq_flags_progress',{correct:0,unlocked:['easy']}).correct);
+  const[difficulty,setDifficulty]=useState(()=>{
+    const saved=ls('kq_flags_difficulty','easy');
+    const unlocked=ls('kq_flags_progress',{correct:0,unlocked:['easy']}).unlocked;
+    if(saved==='all')return unlocked.includes('hard')?'all':unlocked[unlocked.length-1];
+    return unlocked.includes(saved)?saved:unlocked[unlocked.length-1];
+  });
+  const[popup,setPopup]=useState(null);
   const[continent,setContinent]=useState('all');
   const[round,setRound]=useState([]);
   const[idx,setIdx]=useState(0);
@@ -43,8 +51,15 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
   const iRef=useRef(null);
 
   useEffect(()=>{lsSet('kq_flags_best',bests);},[bests]);
+  useEffect(()=>{lsSet('kq_flags_progress',{correct,unlocked:unlk});},[correct,unlk]);
+  useEffect(()=>{lsSet('kq_flags_difficulty',difficulty);},[difficulty]);
+  useEffect(()=>{
+    if(correct>=25&&!unlk.includes('hard')){setUnlk(['easy','medium','hard']);setPopup('hard');playUnlock();}
+    else if(correct>=10&&!unlk.includes('medium')){setUnlk(['easy','medium']);setPopup('medium');playUnlock();}
+  },[correct]);
   useEffect(()=>{if(screen==='quiz'&&!sub&&iRef.current)iRef.current.focus();},[idx,sub,screen]);
   function toggleSoundUi(){setSoundOnUi(toggleSound());}
+  function changeDifficulty(v){setDifficulty(v);}
 
   function pool(){
     return FLAGS.filter(f=>(difficulty==='all'||f.difficulty===difficulty)&&(continent==='all'||f.continent===continent));
@@ -74,7 +89,7 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
     if(sub||!input.trim()||!country)return;
     const ok=isCorrect(input,country);
     setIsOk(ok);
-    if(ok){setScore(s=>s+maxPts);setAnm('pop');playCorrect();}
+    if(ok){setScore(s=>s+maxPts);setAnm('pop');playCorrect();setCorrect(c=>c+1);}
     else{setAnm('wiggle');playWrong();}
     setSub(true);
   }
@@ -118,11 +133,25 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
           </div>
           <div style={{background:"white",borderRadius:24,padding:"20px 18px",boxShadow:"0 24px 64px rgba(0,0,0,.25)"}}>
             <div style={{fontSize:13,color:"#999",fontWeight:700,marginBottom:8,letterSpacing:.5}}>DIFFICULTY</div>
-            <div style={{display:"flex",gap:7,flexWrap:"wrap",marginBottom:18}}>
-              {DIFFS.map(d=>(
-                <button key={d.id} onClick={()=>setDifficulty(d.id)} style={{background:difficulty===d.id?ACC:"#f5f5f5",color:difficulty===d.id?"white":"#777",border:"none",borderRadius:14,padding:"9px 14px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{d.em} {d.lbl}</button>
-              ))}
+            <div style={{display:"flex",gap:7,flexWrap:"wrap",marginBottom:6}}>
+              {LVS.map(L=>{
+                const locked=!unlk.includes(L.id),sel=difficulty===L.id;
+                return(
+                  <button key={L.id} onClick={()=>!locked&&changeDifficulty(L.id)} style={{background:sel?ACC:locked?"#f5f5f5":"#f0f0f0",color:sel?"white":locked?"#ccc":"#777",border:"none",borderRadius:14,padding:"9px 14px",fontSize:14,fontWeight:700,cursor:locked?"not-allowed":"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:4}}>
+                    {locked?"🔒":L.em} {L.lbl}{locked&&<span style={{fontSize:11}}>({L.at}✅)</span>}
+                  </button>
+                );
+              })}
+              {unlk.includes('hard')&&(
+                <button onClick={()=>changeDifficulty('all')} style={{background:difficulty==='all'?ACC:"#f0f0f0",color:difficulty==='all'?"white":"#777",border:"none",borderRadius:14,padding:"9px 14px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>🌈 All Mixed</button>
+              )}
             </div>
+            {(()=>{const nx=LVS.find(L=>!unlk.includes(L.id));if(!nx)return null;const from=LVS[LVS.indexOf(nx)-1]?.at||0;const pct=Math.min(100,Math.max(0,Math.round(((correct-from)/(nx.at-from))*100)));return(
+              <div style={{marginBottom:18}}>
+                <div style={{fontSize:12,color:"#aaa",textAlign:"center",marginBottom:3}}>{nx.at-correct} more correct to unlock {nx.em} {nx.lbl}</div>
+                <div style={{height:5,background:"#f0f0f0",borderRadius:3,overflow:"hidden"}}><div style={{height:5,background:nx.col,borderRadius:3,width:`${pct}%`,transition:"width .5s"}}/></div>
+              </div>
+            );})()}
             <div style={{fontSize:13,color:"#999",fontWeight:700,marginBottom:8,letterSpacing:.5}}>CONTINENT</div>
             <div style={{display:"flex",gap:7,flexWrap:"wrap",marginBottom:18}}>
               <button onClick={()=>setContinent('all')} style={{background:continent==='all'?ACC:"#f5f5f5",color:continent==='all'?"white":"#777",border:"none",borderRadius:14,padding:"9px 14px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>🌐 All</button>
@@ -207,6 +236,7 @@ export default function FlagQuiz({profile,avatarIdx,onBack}){
           </div>
         )}
       </div>
+      {popup&&<UnlockModal lv={popup} onClose={(sw)=>{if(sw)changeDifficulty(popup);setPopup(null);}}/>}
     </div>
   );
 }
